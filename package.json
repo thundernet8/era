@@ -1,0 +1,89 @@
+{
+    "name": "@laix/node-server",
+    "version": "0.0.0",
+    "description": "node server",
+    "main": "index.js",
+    "types": "types/index.d.ts",
+    "files": [
+        "dist",
+        "types"
+    ],
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://git.llsapp.com/tech-clingo/tech-clingo-frontend/node-server.git"
+    },
+    "author": {
+        "name": "xueqian.wu01",
+        "email": "xueqian.wu01@liulishuo.com",
+        "url": "https://git.llsapp.com/xueqian.wu01"
+    },
+    "maintainers": [
+        {
+            "name": "xueqian.wu01",
+            "email": "xueqian.wu01@liulishuo.com",
+            "url": "https://git.llsapp.com/xueqian.wu01"
+        },
+        {
+            "name": "chun.zhang02",
+            "email": "chun.zhang02@liulishuo.com",
+            "url": "https://git.llsapp.com/chun.zhang02"
+        }
+    ],
+    "scripts": {
+        "build": "rimraf dist && tsc -p tsconfig.build.json && cp -R src/*.d.ts types",
+        "prepublishOnly": "npm run build",
+        "release:first": "standard-version --first-release",
+        "release:base": "standard-version --commit-all",
+        "release": "npm run release:base --",
+        "release:pre": "npm run release:base -- --prerelease alpha",
+        "release:patch": "npm run release:base -- --release-as patch",
+        "release:minor": "npm run release:base -- --release-as minor",
+        "release:major": "npm run release:base -- --release-as major",
+        "test": "NODE_ENV=test ts-node ./test/index.ts",
+        "coverage": "npm test -- --coverage",
+        "lint": "tslint --format stylish -p tsconfig.json",
+        "lint:fix": "tslint --format stylish -p tsconfig.json --fix"
+    },
+    "dependencies": {
+        "glob": "^7.1.6",
+        "koa": "^2.11.0",
+        "koa-bodyparser": "^4.2.1",
+        "koa-compose": "^4.1.0",
+        "koa-ejs": "^4.3.0",
+        "koa-helmet": "^5.2.0",
+        "koa-logger": "^3.2.1",
+        "koa-router": "^8.0.8",
+        "koa-static": "^5.0.0",
+        "path-to-regexp": "^6.1.0",
+        "reflect-metadata": "^0.1.13",
+        "vue": "^2.6.11"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.11.2",
+        "@types/koa-bodyparser": "^4.3.0",
+        "@types/koa-helmet": "^3.1.2",
+        "@types/koa-logger": "^3.1.1",
+        "@types/koa-static": "^4.0.1",
+        "@types/node": "^13.7.6",
+        "husky": "^3.0.5",
+        "lint-staged": "^6.1.1",
+        "prettier": "^1.19.1",
+        "rimraf": "^3.0.2",
+        "standard-version": "^7.0.0",
+        "ts-node": "^8.6.2",
+        "tslib": "^1.11.1",
+        "typescript": "^3.8.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{ts}": [
+            "yarn lint:fix",
+            "git add"
+        ]
+    }
+}
