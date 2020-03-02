@@ -1,5 +1,5 @@
 import Koa from 'koa';
 
-export interface ContextT extends Koa.DefaultContext {
-
+export interface IEagleContext extends Koa.DefaultContext {
+    _contextprop: string;
 }
