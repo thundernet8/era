@@ -118,6 +118,13 @@
   dependencies:
     "@types/koa" "*"
 
+"@types/koa-router@^7.4.0":
+  version "7.4.0"
+  resolved "https://npm-registry.llsengineer.com/@types%2fkoa-router/-/koa-router-7.4.0.tgz#4a5f48ca4432281f7429faedd9510c20945939dc"
+  integrity sha1-Sl9IykQyKB90Kfrt2VEMIJRZOdw=
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa-send@*":
   version "4.1.2"
   resolved "https://npm-registry.llsengineer.com/@types%2fkoa-send/-/koa-send-4.1.2.tgz#978f8267ad116d12ac6a18fecd8f34c5657e09ad"
@@ -813,6 +820,11 @@ deep-equal@~1.0.1:
   version "1.0.1"
   resolved "https://npm-registry.llsengineer.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
   integrity sha1-9dJgKStmDghO/0zbyfCK0yR0SLU=
+
+deepmerge@^4.2.2:
+  version "4.2.2"
+  resolved "https://npm-registry.llsengineer.com/deepmerge/-/deepmerge-4.2.2.tgz#44d2ea3679b8f4d4ffba33f03d865fc1e7bf4955"
+  integrity sha1-RNLqNnm49NT/ujPwPYZfwee/SVU=
 
 delegates@^1.0.0:
   version "1.0.0"
@@ -2813,7 +2825,7 @@ ts-node@^8.6.2:
     source-map-support "^0.5.6"
     yn "3.1.1"
 
-tslib@^1.11.1:
+tslib@^1.11.1, tslib@^1.9.3:
   version "1.11.1"
   resolved "https://npm-registry.llsengineer.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
   integrity sha1-6xXRKIJ/vuKEFUnhcfRe0zisfjU=
@@ -2822,6 +2834,13 @@ tsscmp@1.0.6:
   version "1.0.6"
   resolved "https://npm-registry.llsengineer.com/tsscmp/-/tsscmp-1.0.6.tgz#85b99583ac3589ec4bfef825b5000aa911d605eb"
   integrity sha1-hbmVg6w1iexL/vgltQAKqRHWBes=
+
+tsyringe@^4.1.0:
+  version "4.1.0"
+  resolved "https://npm-registry.llsengineer.com/tsyringe/-/tsyringe-4.1.0.tgz#9a0c34b332dee2173b968fb739d24c4e174d3086"
+  integrity sha1-mgw0szLe4hc7lo+3OdJMThdNMIY=
+  dependencies:
+    tslib "^1.9.3"
 
 type-fest@^0.6.0:
   version "0.6.0"
@@ -2881,11 +2900,6 @@ vary@^1.1.2:
   version "1.1.2"
   resolved "https://npm-registry.llsengineer.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
-
-vue@^2.6.11:
-  version "2.6.11"
-  resolved "https://npm-registry.llsengineer.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
-  integrity sha1-dllNh31LEiNEBuhONSdcbVFBJcU=
 
 which-module@^2.0.0:
   version "2.0.0"

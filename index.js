@@ -1,1 +1,1 @@
-module.exports = require('./dist/eagle').EagleApplication;
+module.exports = require('./dist/app');

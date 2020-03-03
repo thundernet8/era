@@ -1,5 +1,6 @@
-import { EagleConstructor } from './app';
+import { Eagle } from './app';
+import "./umd";
 
-export const Eagle: EagleConstructor;
+export * from './app'
 
 export default Eagle;

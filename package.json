@@ -4,6 +4,7 @@
     "description": "node server",
     "main": "index.js",
     "types": "types/index.d.ts",
+    "typings": "types/index.d.ts",
     "files": [
         "dist",
         "types"
@@ -46,6 +47,7 @@
         "lint:fix": "tslint --format stylish -p tsconfig.json --fix"
     },
     "dependencies": {
+        "deepmerge": "^4.2.2",
         "glob": "^7.1.6",
         "koa": "^2.11.0",
         "koa-bodyparser": "^4.2.1",
@@ -57,13 +59,14 @@
         "koa-static": "^5.0.0",
         "path-to-regexp": "^6.1.0",
         "reflect-metadata": "^0.1.13",
-        "vue": "^2.6.11"
+        "tsyringe": "^4.1.0"
     },
     "devDependencies": {
         "@types/koa": "^2.11.2",
         "@types/koa-bodyparser": "^4.3.0",
         "@types/koa-helmet": "^3.1.2",
         "@types/koa-logger": "^3.1.1",
+        "@types/koa-router": "^7.4.0",
         "@types/koa-static": "^4.0.1",
         "@types/node": "^13.7.6",
         "husky": "^3.0.5",
