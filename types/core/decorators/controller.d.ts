@@ -3,7 +3,7 @@ import { Constructor } from '../interfaces/constructor';
  * 控制器装饰器
  * @param prefix 路由前缀
  */
-export declare function Controller(prefix?: string): (target: Constructor<any>) => void;
+export declare function Controller(prefix?: string): (target: Constructor<any>) => any;
 /**
  * 请求装饰器，适用所有类型请求
  * @param route 请求路径

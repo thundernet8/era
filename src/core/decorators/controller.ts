@@ -1,4 +1,4 @@
-import { autoInjectable } from 'tsyringe';
+import { autoInjectable, container } from 'tsyringe';
 import { HttpMethod } from '../interfaces/http-method';
 import { Constructor } from '../interfaces/constructor';
 
@@ -18,7 +18,9 @@ export function Controller(prefix: string = '') {
     return (target: Constructor<any>) => {
         target.prototype.__route_prefix__ = normalizePath(prefix);
         // controllerRegisterMetadata.set(target, target);
-        autoInjectable()(target);
+        const newTarget = autoInjectable()(target);
+        container.register(newTarget, newTarget);
+        return newTarget;
     };
 }
 

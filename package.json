@@ -1,5 +1,5 @@
 {
-    "name": "@laix/node-server",
+    "name": "node-server",
     "version": "0.0.0",
     "description": "node server",
     "main": "index.js",
@@ -12,25 +12,13 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://git.llsapp.com/tech-clingo/tech-clingo-frontend/node-server.git"
+        "url": "https://github.com/thundernet8/node-server.git"
     },
     "author": {
-        "name": "xueqian.wu01",
-        "email": "xueqian.wu01@liulishuo.com",
-        "url": "https://git.llsapp.com/xueqian.wu01"
+        "name": "Touchumind",
+        "email": "chinash2010@gmail.com",
+        "url": "https://github.com/thundernet8"
     },
-    "maintainers": [
-        {
-            "name": "xueqian.wu01",
-            "email": "xueqian.wu01@liulishuo.com",
-            "url": "https://git.llsapp.com/xueqian.wu01"
-        },
-        {
-            "name": "chun.zhang02",
-            "email": "chun.zhang02@liulishuo.com",
-            "url": "https://git.llsapp.com/chun.zhang02"
-        }
-    ],
     "scripts": {
         "build": "rimraf dist && tsc -p tsconfig.build.json && cp -R src/*.d.ts types",
         "prepublishOnly": "npm run build",
@@ -69,6 +57,7 @@
         "@types/koa-router": "^7.4.0",
         "@types/koa-static": "^4.0.1",
         "@types/node": "^13.7.6",
+        "cli-color": "^2.0.0",
         "husky": "^3.0.5",
         "lint-staged": "^6.1.1",
         "prettier": "^1.19.1",

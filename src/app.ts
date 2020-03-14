@@ -20,7 +20,7 @@ import { IEagleState as RawStateT } from './state';
 import { IEagleConfig as RawConfigT } from './config';
 import { BaseKV } from './core/interfaces/kit';
 import { AppOption } from './core/interfaces/app-option';
-import { loadRoutes } from './core/router';
+import bootstrap from './core/bootstrap';
 
 export * from './core';
 
@@ -57,8 +57,8 @@ export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extend
     private async init(options?: AppOption) {
         this.loadEnv();
         this.loadConfig(options);
-        // 加载路由
-        loadRoutes(this as any);
+        // 加载路由/控制器/服务
+        bootstrap(this as any);
         // TODO 基础服务和中间件挂载
     }
 
