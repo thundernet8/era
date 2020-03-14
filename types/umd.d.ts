@@ -2,9 +2,9 @@ import * as accepts from 'accepts';
 import * as Cookies from 'cookies';
 import { IncomingMessage, ServerResponse, Server } from 'http';
 import * as compose from 'koa-compose';
-import { IEagleContext } from './context';
-import { IEagleState } from './state';
-import { EagleApplication } from './app';
+import { IEraContext } from './context';
+import { IEraState } from './state';
+import { EraApplication } from './app';
 import {
     ParameterizedContext,
     BaseContext,
@@ -16,7 +16,7 @@ import {
     Context as KoaContext
 } from 'koa';
 
-type Application = EagleApplication;
+type Application = EraApplication;
 
 // interface ExtendableContext extends BaseContext {
 //     app: Application;
@@ -33,41 +33,41 @@ type Application = EagleApplication;
 //     respond?: boolean;
 // }
 
-type EagleContext = ParameterizedContext<IEagleState, IEagleContext>;
+type EraContext = ParameterizedContext<IEraState, IEraContext>;
 
-// interface EagleRequest extends BaseRequest {
+// interface EraRequest extends BaseRequest {
 //     app: Application;
 //     req: IncomingMessage;
 //     res: ServerResponse;
-//     ctx: EagleContext;
-//     response: EagleResponse;
+//     ctx: EraContext;
+//     response: EraResponse;
 //     originalUrl: string;
 //     ip: string;
 //     accept: accepts.Accepts;
 // }
 
-// interface EagleResponse extends BaseResponse {
+// interface EraResponse extends BaseResponse {
 //     app: Application;
 //     req: IncomingMessage;
 //     res: ServerResponse;
-//     ctx: EagleContext;
-//     request: EagleRequest;
+//     ctx: EraContext;
+//     request: EraRequest;
 // }
 
-declare namespace Eagle {
-    export type Context = EagleContext;
-    export type State = IEagleState;
+declare namespace Era {
+    export type Context = EraContext;
+    export type State = IEraState;
     export type Middleware<
-        StateT = IEagleState,
-        CustomT = IEagleContext
-    > = compose.Middleware<EagleContext>;
-    export type Request = KoaRequest & { ctx: EagleContext };
-    export type Response = KoaResponse & { ctx: EagleContext };
+        StateT = IEraState,
+        CustomT = IEraContext
+    > = compose.Middleware<EraContext>;
+    export type Request = KoaRequest & { ctx: EraContext };
+    export type Response = KoaResponse & { ctx: EraContext };
     export type Next = KoaNext;
 }
 
-declare class Eagle extends EagleApplication {}
+declare class Era extends EraApplication {}
 
-export = Eagle;
+export = Era;
 
-export as namespace Eagle;
+export as namespace Era;

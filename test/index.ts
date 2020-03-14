@@ -1,5 +1,3 @@
-import Eagle from '..';
+import Era from '..';
 
-const app = new Eagle();
-
-
+const app = new Era();

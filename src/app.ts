@@ -2,44 +2,37 @@
 /// <reference types="koa-bodyparser" />
 import 'reflect-metadata';
 import Koa from 'koa';
-import * as accepts from "accepts";
-import * as Cookies from "cookies";
-import { EventEmitter } from "events";
-import { IncomingMessage, ServerResponse, Server } from "http";
-import { Http2ServerRequest, Http2ServerResponse } from 'http2';
-import httpAssert = require("http-assert");
-import * as Keygrip from "keygrip";
-import * as compose from "koa-compose";
-import { Socket, ListenOptions } from "net";
-import * as url from "url";
 import * as fs from 'fs';
 import * as path from 'path';
 import merge from 'deepmerge';
-import { IEagleContext as RawContextT } from './context';
-import { IEagleState as RawStateT } from './state';
-import { IEagleConfig as RawConfigT } from './config';
-import { BaseKV } from './core/interfaces/kit';
-import { AppOption } from './core/interfaces/app-option';
+import { container } from 'tsyringe';
+import { IEraContext as RawContextT } from './context';
+import { IEraState as RawStateT } from './state';
+import { IEraConfig as RawConfigT } from './config';
+import { BaseKV, AppOption } from './core/interfaces';
 import bootstrap from './core/bootstrap';
+import { Logger, EraMiddleware, DIException } from './core';
 
 export * from './core';
 
-export interface EagleApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
+export interface EraApplication<StateT = RawStateT, ContextT = RawContextT>
+    extends Koa<StateT, ContextT> {
     test: number;
 }
 
-export type CombinedEagleInstance<
-    Instance extends EagleApplication,
+export type CombinedEraInstance<
+    Instance extends EraApplication,
     Props
 > = Props & Instance;
 
-export interface EagleConstructor<
-    V extends EagleApplication = EagleApplication
-> {
-    new <Props>(): CombinedEagleInstance<V, Props>;
+export interface EraConstructor<V extends EraApplication = EraApplication> {
+    new <Props>(): CombinedEraInstance<V, Props>;
 }
 
-export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
+export class EraApplication<
+    StateT = RawStateT,
+    ContextT = RawContextT
+> extends Koa<StateT, ContextT> {
     /**
      * 应用名
      */
@@ -50,16 +43,49 @@ export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extend
      */
     env: string = '';
 
+    /**
+     * 默认logger
+     */
+    logger!: Logger;
+
+    /**
+     * Dependency Injection logger
+     */
+    diLogger!: Logger;
+
+    /**
+     * Middleware logger
+     */
+    middlewareLogger!: Logger;
+
     config!: RawConfigT & AppOption;
 
     readonly projectRoot: string = path.resolve(process.cwd());
 
-    private async init(options?: AppOption) {
-        this.loadEnv();
-        this.loadConfig(options);
-        // 加载路由/控制器/服务
-        bootstrap(this as any);
-        // TODO 基础服务和中间件挂载
+    readonly middlewares: EraMiddleware[] = [];
+
+    useMiddleware(middleware: EraMiddleware) {
+        if (this.middlewares.indexOf(middleware) < 0) {
+            this.middlewares.push(middleware);
+            const middlewareInstance = container.resolve<EraMiddleware>(
+                middleware as any
+            );
+            if (typeof middlewareInstance.use !== 'function') {
+                throw new DIException(
+                    `The middleware class ${middleware.name} cannot be resolved`
+                );
+            }
+            this.use(middlewareInstance.use);
+            this.middlewareLogger.log(
+                `Apply middleware ${middleware.name} to app`
+            );
+        }
+    }
+
+    useMiddlewares(middlewares: EraMiddleware[] = []) {
+        for (const middleware of middlewares) {
+            this.useMiddleware(middleware);
+        }
     }
 
     async run(options?: AppOption, beforeInit?: Function) {
@@ -73,7 +99,7 @@ export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extend
                 await new Promise(resolve => {
                     this.listen(port, () => {
                         resolve();
-                        console.log(
+                        this.logger.log(
                             `Server start listen at http://127.0.0.1:${port}`
                         );
                     });
@@ -82,6 +108,19 @@ export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extend
         } catch (e) {
             this.onStartUpError(e);
         }
+    }
+
+    private async init(options: AppOption = {}) {
+        this.loadEnv();
+        this.loadConfig(options);
+        // 加载路由/控制器/服务
+        bootstrap(this as any);
+        // TODO 基础服务和中间件挂载
+
+        const name = options.name || 'App';
+        this.logger = new Logger(name);
+        this.diLogger = new Logger('DependencyInjection');
+        this.middlewareLogger = new Logger('Middleware');
     }
 
     private loadEnv() {
@@ -154,17 +193,17 @@ export class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extend
     }
 }
 
-export interface Eagle {
+export interface Era {
     Context: RawContextT;
     State: RawStateT;
 }
 
-export const Eagle: EagleConstructor = {} as any;
+export const Era: EraConstructor = {} as any;
 
-export default EagleApplication;
+export default EraApplication;
 
 declare module 'koa' {
-    export class Application extends EagleApplication {
+    export class Application extends EraApplication {
         xyz: string;
     }
 

@@ -1,6 +1,6 @@
-import { Eagle } from './app';
-import "./umd";
+import { Era } from './app';
+import './umd';
 
-export * from './app'
+export * from './app';
 
-export default Eagle;
+export default Era;

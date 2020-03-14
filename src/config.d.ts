@@ -1,4 +1,4 @@
-export interface IEagleConfig {
+export interface IEraConfig {
     /**
      * 应用环境
      */

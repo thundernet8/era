@@ -1,5 +1,5 @@
 declare module 'eagle' {
-    interface Eagle {
+    interface Era {
         xxx: string;
     }
 }

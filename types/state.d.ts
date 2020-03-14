@@ -1,5 +1,5 @@
 import Koa from 'koa';
 
-export interface IEagleState extends Koa.DefaultState {
+export interface IEraState extends Koa.DefaultState {
     _stateprop: string;
 }

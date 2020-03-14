@@ -1,18 +1,19 @@
 import 'reflect-metadata';
 import Koa from 'koa';
-import { IEagleContext as RawContextT } from './context';
-import { IEagleState as RawStateT } from './state';
-import { IEagleConfig as RawConfigT } from './config';
+import { IEraContext as RawContextT } from './context';
+import { IEraState as RawStateT } from './state';
+import { IEraConfig as RawConfigT } from './config';
 import { AppOption } from './core/interfaces/app-option';
+import { Logger } from './core/services';
 export * from './core';
-export interface EagleApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
+export interface EraApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
     test: number;
 }
-export declare type CombinedEagleInstance<Instance extends EagleApplication, Props> = Props & Instance;
-export interface EagleConstructor<V extends EagleApplication = EagleApplication> {
-    new <Props>(): CombinedEagleInstance<V, Props>;
+export declare type CombinedEraInstance<Instance extends EraApplication, Props> = Props & Instance;
+export interface EraConstructor<V extends EraApplication = EraApplication> {
+    new <Props>(): CombinedEraInstance<V, Props>;
 }
-export declare class EagleApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
+export declare class EraApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
     /**
      * 应用名
      */
@@ -21,6 +22,10 @@ export declare class EagleApplication<StateT = RawStateT, ContextT = RawContextT
      * 应用环境
      */
     env: string;
+    /**
+     * 默认logger
+     */
+    logger: Logger;
     config: RawConfigT & AppOption;
     readonly projectRoot: string;
     private init;
@@ -29,14 +34,14 @@ export declare class EagleApplication<StateT = RawStateT, ContextT = RawContextT
     private loadConfig;
     private onStartUpError;
 }
-export interface Eagle {
+export interface Era {
     Context: RawContextT;
     State: RawStateT;
 }
-export declare const Eagle: EagleConstructor;
-export default EagleApplication;
+export declare const Era: EraConstructor;
+export default EraApplication;
 declare module 'koa' {
-    class Application extends EagleApplication {
+    class Application extends EraApplication {
         xyz: string;
     }
     interface Request {

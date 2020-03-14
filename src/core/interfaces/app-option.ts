@@ -1,3 +1,5 @@
+import bodyParser from 'koa-bodyparser';
+
 export interface AppOption {
     name?: string;
     env?: string;
@@ -14,4 +16,8 @@ export interface AppOption {
      * 静态资源文件夹相对于app文件夹的路径，默认public
      */
     staticDir?: string;
+    /**
+     * koa-bodyparser的选项
+     */
+    bodyParserOptions?: bodyParser.Options;
 }

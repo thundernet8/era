@@ -1,2 +1,2 @@
-import { EagleApplication } from '../app';
-export default function bootstrap(app: EagleApplication): void;
+import { EraApplication } from '../app';
+export default function bootstrap(app: EraApplication): void;

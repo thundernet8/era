@@ -1,10 +1,14 @@
 import * as path from 'path';
 import Router from 'koa-router';
 import { container } from 'tsyringe';
-import { EagleApplication } from '../app';
+import clc from 'cli-color';
+import { EraApplication } from '../app';
 import { scan } from './helpers/scanner';
 import { DIException } from './exceptions';
 import { Logger } from './services/log.service';
+import { IEraContext } from '../context';
+
+const yellow = clc.xterm(3);
 
 function registerPrimitiveTypes() {
     container.register(String, {
@@ -15,18 +19,18 @@ function registerPrimitiveTypes() {
     });
 }
 
-function loadControllersAndRoutes(app: EagleApplication) {
+function loadControllersAndRoutes(app: EraApplication) {
     const logger = new Logger('Controller');
     const start = Date.now();
     const router = new Router();
     const controllerDir = path.resolve(app.projectRoot, 'app/controller');
-    logger.log(`Scan controller dirctory: ${controllerDir}`);
+    logger.log(`Load controllers from directory: ${controllerDir}`);
     const controllerConstructors = scan(
         controllerDir,
         '**/*.controller.{js,ts}'
     );
     for (const controllerConstructor of controllerConstructors) {
-        logger.log(`Collect controller ${controllerConstructor.name}`);
+        logger.log(`+ Load controller ${controllerConstructor.name}`);
         if (!container.isRegistered(controllerConstructor)) {
             throw new DIException(
                 `The controller class:[${controllerConstructor.name}] must be decorated by @Controller decorator`
@@ -41,28 +45,41 @@ function loadControllersAndRoutes(app: EagleApplication) {
         }
         const proto = controllerConstructor.prototype;
         const routePrefix = proto.__route_prefix__ || '/';
+        const controllerMiddlewares = proto.__middlewares__ || [];
         const subRouter = new Router({
             prefix: routePrefix
         });
         const actions = proto.__actions__ || [];
         for (const action of actions) {
             logger.log(
-                `Register route: ${action.method.toUpperCase()} ${path.join(
+                `+ Register route: ${action.method.toUpperCase()} ${path.join(
                     proto.__route_prefix__ || '/',
                     action.route
                 )}`
             );
-            var a = '';
-            subRouter[action.method](action.route, (ctx, next) => {
-                const controller = container.resolve<any>(
-                    controllerConstructor
-                );
-                if (controller) {
-                    return controller[action.handler](ctx, next);
+            const actionMiddlewares =
+                proto.__action_middlewares__[action.handler] || [];
+            subRouter[action.method](
+                action.route,
+                ...controllerMiddlewares,
+                ...actionMiddlewares,
+                (ctx: IEraContext, next) => {
+                    try {
+                        const controller = container.resolve<any>(
+                            controllerConstructor
+                        );
+                        if (controller) {
+                            return controller[action.handler](ctx, next);
+                        }
+                        throw new DIException(
+                            `The controller ${controllerConstructor.name} cannot be resolved`
+                        );
+                    } catch (e) {
+                        ctx.app.diLogger.error(e.message);
+                    }
+                    return next();
                 }
-                // TODO log controller not resolved
-                return next();
-            });
+            );
         }
         router.use(subRouter.routes());
         router.use(subRouter.allowedMethods());
@@ -70,21 +87,19 @@ function loadControllersAndRoutes(app: EagleApplication) {
 
     app.use(router.routes());
     app.use(router.allowedMethods());
-    logger.log(
-        `Scan controller done: ${((Date.now() - start) / 1000).toFixed(2)}s`
-    );
+    logger.log(`Load controllers done ${yellow(`+${Date.now() - start}ms`)}`);
 }
 
 function loadServices(dir: string, log: boolean = true) {
     const logger = new Logger('Service');
     const start = Date.now();
     if (log) {
-        logger.log(`Scan service dirctory: ${dir}`);
+        logger.log(`Load services from directory: ${dir}`);
     }
     const serviceConstructors = scan(dir, '**/*.service.{js,ts}');
     for (const serviceConstructor of serviceConstructors) {
         if (log) {
-            logger.log(`Collect service ${serviceConstructor.name}`);
+            logger.log(`+ Load service ${serviceConstructor.name}`);
         }
         if (!container.isRegistered(serviceConstructor)) {
             throw new DIException(
@@ -100,15 +115,46 @@ function loadServices(dir: string, log: boolean = true) {
         }
     }
     if (log) {
+        logger.log(`Load services done ${yellow(`+${Date.now() - start}ms`)}`);
+    }
+}
+
+function loadMiddlewares(dir: string, log: boolean = true) {
+    const logger = new Logger('Middleware');
+    const start = Date.now();
+    if (log) {
+        logger.log(`Load middlewares from directory: ${dir}`);
+    }
+    const middlewareConstructors = scan(dir, '**/*.middleware.{js,ts}');
+    for (const middlewareConstructor of middlewareConstructors) {
+        if (log) {
+            logger.log(`+ Load middleware ${middlewareConstructor.name}`);
+        }
+        if (!container.isRegistered(middlewareConstructor)) {
+            throw new DIException(
+                `The middleware class:[${middlewareConstructor.name}] must be decorated by @Middleware decorator`
+            );
+        }
+        try {
+            container.resolve(middlewareConstructor);
+        } catch (e) {
+            throw new DIException(
+                `The middleware class:[${middlewareConstructor.name}] cannot be resolved`
+            );
+        }
+    }
+    if (log) {
         logger.log(
-            `Scan service done: ${((Date.now() - start) / 1000).toFixed(2)}s`
+            `Load middlewares done ${yellow(`+${Date.now() - start}ms`)}`
         );
     }
 }
 
-export default function bootstrap(app: EagleApplication) {
+export default function bootstrap(app: EraApplication) {
     registerPrimitiveTypes();
-    loadControllersAndRoutes(app);
+    loadMiddlewares(path.resolve(__dirname, 'middlewares'), false);
+    loadMiddlewares(path.resolve(app.projectRoot, 'app/middlewares'));
     loadServices(path.resolve(__dirname, 'services'), false);
     loadServices(path.resolve(app.projectRoot, 'app/service'));
+    loadControllersAndRoutes(app);
 }

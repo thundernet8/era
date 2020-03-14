@@ -158,12 +158,12 @@ export class Logger implements LoggerService {
             localeStringOptions
         );
 
-        const pidMessage = color(`[NodeServer] ${process.pid}   - `);
+        const pidMessage = color(`[NodeServer] ${process.pid} - `);
         const contextMessage = context ? yellow(`[${context}] `) : '';
         const timestampDiff = this.updateAndGetTimestampDiff(isTimeDiffEnabled);
 
         process.stdout.write(
-            `${pidMessage}${timestamp}   ${contextMessage}${output}${timestampDiff}\n`
+            `${pidMessage}${timestamp} ${contextMessage}${output}${timestampDiff}\n`
         );
     }
 
