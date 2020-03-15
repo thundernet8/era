@@ -6,12 +6,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import merge from 'deepmerge';
 import { container } from 'tsyringe';
+import clc from 'cli-color';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
 import { BaseKV, AppOption } from './core/interfaces';
 import bootstrap from './core/bootstrap';
 import { Logger, EraMiddleware, DIException } from './core';
+import { isMiddlewareMatchScope } from './core/helpers';
+
+const yellow = clc.xterm(3);
 
 export * from './core';
 
@@ -75,9 +79,15 @@ export class EraApplication<
                     `The middleware class ${middleware.name} cannot be resolved`
                 );
             }
+            try {
+                isMiddlewareMatchScope(middlewareInstance, 'Method');
+            } catch (e) {
+                this.logger.error(e.message, e.stack, 'Middleware');
+                throw e;
+            }
             this.use(middlewareInstance.use);
             this.middlewareLogger.log(
-                `Apply middleware ${middleware.name} to app`
+                `Apply middleware ${yellow(middleware.name)} to app`
             );
         }
     }
@@ -111,16 +121,16 @@ export class EraApplication<
     }
 
     private async init(options: AppOption = {}) {
-        this.loadEnv();
-        this.loadConfig(options);
-        // 加载路由/控制器/服务
-        bootstrap(this as any);
-        // TODO 基础服务和中间件挂载
-
         const name = options.name || 'App';
         this.logger = new Logger(name);
         this.diLogger = new Logger('DependencyInjection');
         this.middlewareLogger = new Logger('Middleware');
+        // 设定环境
+        this.loadEnv();
+        // 加载配置
+        this.loadConfig(options);
+        // 加载路由/控制器/服务
+        bootstrap(this as any);
     }
 
     private loadEnv() {

@@ -1,7 +1,5 @@
 import { IEraContext } from '../../context';
-
-export type MiddlewareScope = 'App' | 'Controller' | 'Method' | 'All';
-
+export declare type MiddlewareScope = 'App' | 'Controller' | 'Method' | 'All';
 export interface EraMiddleware {
     name?: string;
     /**

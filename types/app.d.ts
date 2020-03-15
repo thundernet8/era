@@ -3,8 +3,8 @@ import Koa from 'koa';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
-import { AppOption } from './core/interfaces/app-option';
-import { Logger } from './core/services';
+import { AppOption } from './core/interfaces';
+import { Logger, EraMiddleware } from './core';
 export * from './core';
 export interface EraApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
     test: number;
@@ -26,10 +26,21 @@ export declare class EraApplication<StateT = RawStateT, ContextT = RawContextT> 
      * 默认logger
      */
     logger: Logger;
+    /**
+     * Dependency Injection logger
+     */
+    diLogger: Logger;
+    /**
+     * Middleware logger
+     */
+    middlewareLogger: Logger;
     config: RawConfigT & AppOption;
     readonly projectRoot: string;
-    private init;
+    readonly middlewares: EraMiddleware[];
+    useMiddleware(middleware: EraMiddleware): void;
+    useMiddlewares(middlewares?: EraMiddleware[]): void;
     run(options?: AppOption, beforeInit?: Function): Promise<void>;
+    private init;
     private loadEnv;
     private loadConfig;
     private onStartUpError;

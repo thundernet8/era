@@ -13,7 +13,7 @@ interface ControllerDecoratorOptions {
     /**
      * 控制器scoped的中间件
      */
-    middlewares?: EraMiddleware[];
+    middlewares?: Constructor<EraMiddleware>[];
 }
 
 /**
@@ -27,7 +27,6 @@ export function Controller(
     return (target: Constructor<any>) => {
         target.prototype.__route_prefix__ = normalizePath(prefix);
         target.prototype.__middlewares__ = options.middlewares || [];
-        // controllerRegisterMetadata.set(target, target);
         const newTarget = autoInjectable()(target);
         container.register(newTarget, newTarget);
         return newTarget;
@@ -38,7 +37,7 @@ interface MethodDecoratorOptions {
     /**
      * 路由方法scoped的中间件
      */
-    middlewares?: EraMiddleware[];
+    middlewares?: Constructor<EraMiddleware>[];
 }
 
 /**
@@ -47,7 +46,7 @@ interface MethodDecoratorOptions {
 function HttpBaseMethod(
     route: string,
     method: HttpMethod,
-    middlewares: EraMiddleware[] = []
+    middlewares: Constructor<EraMiddleware>[] = []
 ) {
     return (target: any, name: string) => {
         const proto = target.constructor.prototype;

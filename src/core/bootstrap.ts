@@ -3,10 +3,11 @@ import Router from 'koa-router';
 import { container } from 'tsyringe';
 import clc from 'cli-color';
 import { EraApplication } from '../app';
-import { scan } from './helpers/scanner';
+import { scan, isMiddlewareMatchScope } from './helpers';
 import { DIException } from './exceptions';
-import { Logger } from './services/log.service';
+import { Logger } from './services';
 import { IEraContext } from '../context';
+import { EraMiddleware } from './interfaces';
 
 const yellow = clc.xterm(3);
 
@@ -20,11 +21,11 @@ function registerPrimitiveTypes() {
 }
 
 function loadControllersAndRoutes(app: EraApplication) {
-    const logger = new Logger('Controller');
+    const logger = new Logger('Bootstrap<Controller>');
     const start = Date.now();
     const router = new Router();
     const controllerDir = path.resolve(app.projectRoot, 'app/controller');
-    logger.log(`Load controllers from directory: ${controllerDir}`);
+    logger.log(`Load controllers from directory: ${yellow(controllerDir)}`);
     const controllerConstructors = scan(
         controllerDir,
         '**/*.controller.{js,ts}'
@@ -46,19 +47,34 @@ function loadControllersAndRoutes(app: EraApplication) {
         const proto = controllerConstructor.prototype;
         const routePrefix = proto.__route_prefix__ || '/';
         const controllerMiddlewares = proto.__middlewares__ || [];
+        for (const middleware of controllerMiddlewares) {
+            try {
+                isMiddlewareMatchScope(middleware, 'Controller');
+            } catch (e) {
+                logger.error(e.message);
+                throw e;
+            }
+        }
         const subRouter = new Router({
             prefix: routePrefix
         });
         const actions = proto.__actions__ || [];
         for (const action of actions) {
-            logger.log(
-                `+ Register route: ${action.method.toUpperCase()} ${path.join(
-                    proto.__route_prefix__ || '/',
-                    action.route
-                )}`
-            );
+            const fullPath = `${action.method.toUpperCase()} ${path.join(
+                proto.__route_prefix__ || '/',
+                action.route
+            )}`;
+            logger.log(`+ Register route: ${yellow(fullPath)}`);
             const actionMiddlewares =
                 proto.__action_middlewares__[action.handler] || [];
+            for (const middleware of actionMiddlewares) {
+                try {
+                    isMiddlewareMatchScope(middleware, 'Method');
+                } catch (e) {
+                    logger.error(e.message);
+                    throw e;
+                }
+            }
             subRouter[action.method](
                 action.route,
                 ...controllerMiddlewares,
@@ -75,7 +91,9 @@ function loadControllersAndRoutes(app: EraApplication) {
                             `The controller ${controllerConstructor.name} cannot be resolved`
                         );
                     } catch (e) {
-                        ctx.app.diLogger.error(e.message);
+                        ctx.app.diLogger.error(e.message, e.stack);
+                        ctx.body = e.message;
+                        ctx.status = 500;
                     }
                     return next();
                 }
@@ -91,15 +109,15 @@ function loadControllersAndRoutes(app: EraApplication) {
 }
 
 function loadServices(dir: string, log: boolean = true) {
-    const logger = new Logger('Service');
+    const logger = new Logger('Bootstrap<Service>');
     const start = Date.now();
     if (log) {
-        logger.log(`Load services from directory: ${dir}`);
+        logger.log(`Load services from directory: ${yellow(dir)}`);
     }
     const serviceConstructors = scan(dir, '**/*.service.{js,ts}');
     for (const serviceConstructor of serviceConstructors) {
         if (log) {
-            logger.log(`+ Load service ${serviceConstructor.name}`);
+            logger.log(`+ Load service ${yellow(serviceConstructor.name)}`);
         }
         if (!container.isRegistered(serviceConstructor)) {
             throw new DIException(
@@ -119,42 +137,41 @@ function loadServices(dir: string, log: boolean = true) {
     }
 }
 
-function loadMiddlewares(dir: string, log: boolean = true) {
-    const logger = new Logger('Middleware');
+function loadMiddlewares(app: EraApplication, dir: string) {
+    const logger = new Logger('Bootstrap<Middleware>');
     const start = Date.now();
-    if (log) {
-        logger.log(`Load middlewares from directory: ${dir}`);
-    }
+    logger.log(`Load middlewares from directory: ${yellow(dir)}`);
     const middlewareConstructors = scan(dir, '**/*.middleware.{js,ts}');
     for (const middlewareConstructor of middlewareConstructors) {
-        if (log) {
-            logger.log(`+ Load middleware ${middlewareConstructor.name}`);
-        }
+        logger.log(`+ Load middleware ${yellow(middlewareConstructor.name)}`);
         if (!container.isRegistered(middlewareConstructor)) {
             throw new DIException(
                 `The middleware class:[${middlewareConstructor.name}] must be decorated by @Middleware decorator`
             );
         }
         try {
-            container.resolve(middlewareConstructor);
+            const middleware = container.resolve<EraMiddleware>(
+                middlewareConstructor
+            );
+            if (middleware.scope === 'All' || middleware.scope === 'App') {
+                app.useMiddleware(middlewareConstructor);
+            }
         } catch (e) {
             throw new DIException(
                 `The middleware class:[${middlewareConstructor.name}] cannot be resolved`
             );
         }
     }
-    if (log) {
-        logger.log(
-            `Load middlewares done ${yellow(`+${Date.now() - start}ms`)}`
-        );
-    }
+    logger.log(`Load middlewares done ${yellow(`+${Date.now() - start}ms`)}`);
 }
 
 export default function bootstrap(app: EraApplication) {
-    registerPrimitiveTypes();
-    loadMiddlewares(path.resolve(__dirname, 'middlewares'), false);
-    loadMiddlewares(path.resolve(app.projectRoot, 'app/middlewares'));
+    // registerPrimitiveTypes();
+    loadMiddlewares(app, path.resolve(__dirname, 'middlewares'));
+    loadMiddlewares(app, path.resolve(app.projectRoot, 'app/middlewares'));
     loadServices(path.resolve(__dirname, 'services'), false);
     loadServices(path.resolve(app.projectRoot, 'app/service'));
     loadControllersAndRoutes(app);
 }
+
+registerPrimitiveTypes();
