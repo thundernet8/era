@@ -21,3 +21,8 @@ export interface AppOption {
      */
     bodyParserOptions?: bodyParser.Options;
 }
+
+export interface ParamDecoratorOptions {
+    required?: boolean;
+    defaultValue?: any;
+}
