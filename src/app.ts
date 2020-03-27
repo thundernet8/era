@@ -5,14 +5,13 @@ import Koa from 'koa';
 import * as fs from 'fs';
 import * as path from 'path';
 import merge from 'deepmerge';
-import { container } from 'tsyringe';
 import clc from 'cli-color';
 import bootstrap from './core/Bootstrap';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
 import { BaseKV, AppOption } from './core/interfaces';
-import { Logger, EraMiddleware, DIException } from './core';
+import { Logger } from './core';
 
 const yellow = clc.xterm(3);
 
