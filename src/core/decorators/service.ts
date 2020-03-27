@@ -1,13 +1,11 @@
-import { autoInjectable, container } from 'tsyringe';
-import { Constructor } from '../interfaces/constructor';
+import { Constructor } from '../interfaces';
+import { ServiceRegistry } from '../registry';
 
 /**
  * 服务装饰器
  */
 export function Service() {
     return (target: Constructor<any>) => {
-        const newTarget = autoInjectable()(target);
-        container.register(newTarget, newTarget);
-        return newTarget;
+        return ServiceRegistry.register(target);
     };
 }

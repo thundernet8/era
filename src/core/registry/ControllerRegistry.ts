@@ -1,13 +1,19 @@
 import { autoInjectable, container } from 'tsyringe';
-import { Constructor, EraMiddleware, HttpMethod } from '../interfaces';
+import {
+    Constructor,
+    EraMiddleware,
+    HttpMethod,
+    IController
+} from '../interfaces';
 import { ActionRegistry, ActionMetadata } from './ActionRegistry';
+import { MiddlewareMetadata, MiddlewareRegistry } from './MiddlewareRegistry';
 
 class ControllerMetadata {
     public readonly type: Constructor;
 
     public routePrefix: string;
 
-    public middlewares: Constructor<EraMiddleware>[];
+    public middlewares: MiddlewareMetadata[];
 
     public readonly actions: Map<string, ActionMetadata>;
 
@@ -31,18 +37,19 @@ export class ControllerRegistry {
         middlewares?: Constructor<EraMiddleware>[]
     ) {
         const controllerMetadata = this.resolveControllerMetadata(controller);
-        controllerMetadata.routePrefix = routePrefix;
-        controllerMetadata.middlewares = middlewares || [];
-        const newTarget = autoInjectable()(controller);
-        container.register(newTarget, newTarget);
-        return newTarget;
+        controllerMetadata.routePrefix = routePrefix || '/';
+        controllerMetadata.middlewares = (middlewares || []).map(middleware => {
+            return MiddlewareRegistry.getMiddleware(middleware)!;
+        });
+        // const newTarget = autoInjectable()(controller);
+        container.register(controller, controller);
     }
 
     public static registerAction(
         controller: Constructor,
         actionName: string,
         httpMethod: HttpMethod,
-        path: string
+        paths: string[]
     ) {
         const controllerMetadata = this.resolveControllerMetadata(controller);
         const actionMetadata = ActionRegistry.resolveActionMetadata(
@@ -50,10 +57,12 @@ export class ControllerRegistry {
             actionName
         );
 
-        actionMetadata.routes.push({
-            method: httpMethod,
-            path
-        });
+        for (const path of paths) {
+            actionMetadata.routes.push({
+                method: httpMethod,
+                path
+            });
+        }
 
         controllerMetadata.actions.set(actionName, actionMetadata);
     }
@@ -69,5 +78,11 @@ export class ControllerRegistry {
         return controllerMetadata;
     }
 
-    public static resolveController(controller: Constructor) {}
+    public static resolveController(controller: Constructor) {
+        return container.resolve<IController>(controller);
+    }
+
+    public static getControllers() {
+        return Array.from(this.controllers.values());
+    }
 }

@@ -13,7 +13,6 @@ import { IEraConfig as RawConfigT } from './config';
 import { BaseKV, AppOption } from './core/interfaces';
 import bootstrap from './core/bootstrap';
 import { Logger, EraMiddleware, DIException } from './core';
-import { isMiddlewareMatchScope } from './core/helpers';
 
 const yellow = clc.xterm(3);
 
@@ -79,12 +78,12 @@ export class EraApplication<
                     `The middleware class ${middleware.name} cannot be resolved`
                 );
             }
-            try {
-                isMiddlewareMatchScope(middlewareInstance, 'Method');
-            } catch (e) {
-                this.logger.error(e.message, e.stack, 'Middleware');
-                throw e;
-            }
+            // try {
+            //     isMiddlewareMatchScope(middlewareInstance, 'Method');
+            // } catch (e) {
+            //     this.logger.error(e.message, e.stack, 'Middleware');
+            //     throw e;
+            // }
             this.use(middlewareInstance.use);
             this.middlewareLogger.log(
                 `Apply middleware ${yellow(middleware.name)} to app`

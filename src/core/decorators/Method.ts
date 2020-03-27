@@ -13,29 +13,17 @@ interface MethodDecoratorOptions {
  * 请求方法装饰器工厂方法
  */
 function HttpBaseMethod(
-    route: string,
+    route: string | string[],
     method: HttpMethod,
     middlewares: Constructor<EraMiddleware>[] = []
 ) {
     return (target: any, name: string) => {
-        const proto = target.constructor.prototype;
-        if (!proto.__actions__) {
-            proto.__actions__ = [];
-        }
-        if (!proto.__action_middlewares__) {
-            proto.__action_middlewares__ = [];
-        }
-        proto.__actions__.push({
-            method,
-            handler: name,
-            route: normalizePath(route)
-        });
-        proto.__action_middlewares__[name] = middlewares;
+        const routes = Array.isArray(route) ? route : [route];
         ControllerRegistry.registerAction(
             target,
             name,
             method,
-            normalizePath(route)
+            routes.map(normalizePath)
         );
     };
 }
@@ -44,7 +32,10 @@ function HttpBaseMethod(
  * 请求装饰器，适用所有类型请求
  * @param route 请求路径
  */
-export function HttpAll(route: string, options: MethodDecoratorOptions = {}) {
+export function HttpAll(
+    route: string | string[],
+    options: MethodDecoratorOptions = {}
+) {
     return HttpBaseMethod(route, HttpMethod.All);
 }
 
@@ -52,7 +43,10 @@ export function HttpAll(route: string, options: MethodDecoratorOptions = {}) {
  * GET请求装饰器
  * @param route 请求路径
  */
-export function HttpGet(route: string, options: MethodDecoratorOptions = {}) {
+export function HttpGet(
+    route: string | string[],
+    options: MethodDecoratorOptions = {}
+) {
     return HttpBaseMethod(route, HttpMethod.Get);
 }
 
@@ -60,7 +54,10 @@ export function HttpGet(route: string, options: MethodDecoratorOptions = {}) {
  * POST请求装饰器
  * @param route 请求路径
  */
-export function HttpPost(route: string, options: MethodDecoratorOptions = {}) {
+export function HttpPost(
+    route: string | string[],
+    options: MethodDecoratorOptions = {}
+) {
     return HttpBaseMethod(route, HttpMethod.Post);
 }
 
@@ -68,7 +65,10 @@ export function HttpPost(route: string, options: MethodDecoratorOptions = {}) {
  * PUT请求装饰器
  * @param route 请求路径
  */
-export function HttpPut(route: string, options: MethodDecoratorOptions = {}) {
+export function HttpPut(
+    route: string | string[],
+    options: MethodDecoratorOptions = {}
+) {
     return HttpBaseMethod(route, HttpMethod.Put);
 }
 
@@ -76,7 +76,10 @@ export function HttpPut(route: string, options: MethodDecoratorOptions = {}) {
  * PATCH请求装饰器
  * @param route 请求路径
  */
-export function HttpPatch(route: string, options: MethodDecoratorOptions = {}) {
+export function HttpPatch(
+    route: string | string[],
+    options: MethodDecoratorOptions = {}
+) {
     return HttpBaseMethod(route, HttpMethod.Patch);
 }
 
@@ -85,7 +88,7 @@ export function HttpPatch(route: string, options: MethodDecoratorOptions = {}) {
  * @param route 请求路径
  */
 export function HttpDelete(
-    route: string,
+    route: string | string[],
     options: MethodDecoratorOptions = {}
 ) {
     return HttpBaseMethod(route, HttpMethod.Delete);

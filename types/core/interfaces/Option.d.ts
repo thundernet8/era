@@ -1,6 +1,5 @@
 import bodyParser from 'koa-bodyparser';
 import { IEraConfig } from '../../config';
-
 export interface AppOption {
     name?: string;
     env?: string;
@@ -22,27 +21,23 @@ export interface AppOption {
      */
     bodyParserOptions?: bodyParser.Options;
 }
-
 export interface ParamDecoratorOptions {
     required?: boolean;
     defaultValue?: any;
 }
-
 export interface MiddlewareDecoratorOptions {
     /**
      * 中间件优先级，数值越低优先被执行，默认10
      */
     priority?: number;
-
     /**
      * 路由匹配，使用koa路由格式
      */
     match?: string[];
-
     /**
      * 是否启用，默认是
      */
     enable?: boolean | MiddlewareEnableFunction;
 }
-
-type MiddlewareEnableFunction = (config: IEraConfig) => boolean;
+declare type MiddlewareEnableFunction = (config: IEraConfig) => boolean;
+export {};

@@ -30,6 +30,8 @@ class ActionParamMetadata {
 
     public readonly required: boolean;
 
+    public readonly isDecorated: boolean;
+
     constructor(
         controller: Constructor,
         actionName: string,
@@ -37,6 +39,7 @@ class ActionParamMetadata {
         returnType: Constructor,
         paramType?: ParamType,
         expression?: string,
+        isDecorated: boolean = false,
         options: ParamDecoratorOptions = {}
     ) {
         this.controller = controller;
@@ -53,6 +56,7 @@ class ActionParamMetadata {
         if (typeof options.defaultValue !== 'undefined') {
             this.defaultValue = options.defaultValue;
         }
+        this.isDecorated = isDecorated;
         if (typeof options.required !== 'undefined') {
             this.required = options.required;
         } else {
@@ -64,7 +68,7 @@ class ActionParamMetadata {
 export class ActionMetadata {
     public readonly actionName: string;
 
-    public readonly controller: Constructor;
+    public readonly type: Constructor;
 
     public routes: ActionRoute[];
 
@@ -83,11 +87,11 @@ export class ActionMetadata {
     // }
 
     constructor(
-        controller: Constructor,
+        type: Constructor,
         actionName: string,
         params?: Map<number, ActionParamMetadata>
     ) {
-        this.controller = controller;
+        this.type = type;
         this.actionName = actionName;
 
         if (typeof params !== 'undefined') {
@@ -107,7 +111,7 @@ export class ActionRegistry {
 
     /**
      * 控制器方法参数类型装饰器调用来注册参数的元信息
-     * @param controller
+     * @param type
      * @param actionName
      * @param index
      * @param paramType
@@ -115,58 +119,50 @@ export class ActionRegistry {
      * @param options
      */
     public static registerParam(
-        controller: Constructor,
+        type: Constructor,
         actionName: string,
         index: number,
         paramType: ParamType,
         expression: string,
         options?: ParamDecoratorOptions
     ) {
-        const actionMetadata = this.resolveActionMetadata(
-            controller,
-            actionName
-        );
-        const params = Reflection.getParams(controller.prototype, actionName);
+        const actionMetadata = this.resolveActionMetadata(type, actionName);
+        const params = Reflection.getParams(type.prototype, actionName);
         const returnType = params[index];
 
         const paramMetadata = new ActionParamMetadata(
-            controller,
+            type,
             actionName,
             index,
             returnType,
             paramType,
             expression,
+            true,
             options
         );
         actionMetadata.params.set(index, paramMetadata);
     }
 
-    public static resolveActionMetadata(
-        controller: Constructor,
-        actionName: string
-    ) {
-        let actionStore = this.handlers.get(controller);
+    public static resolveActionMetadata(type: Constructor, actionName: string) {
+        let actionStore = this.handlers.get(type);
 
         if (typeof actionStore === 'undefined') {
             actionStore = new Map();
-            this.handlers.set(controller, actionStore);
+            this.handlers.set(type, actionStore);
         }
 
         let actionMetadata = actionStore.get(actionName);
 
         if (typeof actionMetadata === 'undefined') {
-            actionMetadata = new ActionMetadata(controller, actionName);
+            actionMetadata = new ActionMetadata(type, actionName);
 
-            const params = Reflection.getParams(
-                controller.prototype,
-                actionName
-            );
+            const params = Reflection.getParams(type.prototype, actionName);
 
             if (params) {
                 const actionParams = params.map(
                     (returnType, index) =>
                         new ActionParamMetadata(
-                            controller,
+                            type,
                             actionName,
                             index,
                             returnType

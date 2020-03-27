@@ -1,14 +1,12 @@
 import { autoInjectable, container } from 'tsyringe';
-import { Constructor, MiddlewareScope } from '../interfaces';
+import { Constructor, MiddlewareDecoratorOptions } from '../interfaces';
+import { MiddlewareRegistry } from '../registry';
 
 /**
  * 中间件装饰器
  */
-export function Middleware(scope: MiddlewareScope = 'All') {
+export function Middleware(options: MiddlewareDecoratorOptions = {}) {
     return (target: Constructor<any>) => {
-        target.prototype.scope = scope;
-        const newTarget = autoInjectable()(target);
-        container.register(newTarget, newTarget);
-        return newTarget;
+        return MiddlewareRegistry.register(target, options);
     };
 }

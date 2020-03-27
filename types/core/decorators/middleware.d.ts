@@ -1,5 +1,5 @@
-import { Constructor, MiddlewareScope } from '../interfaces';
+import { Constructor, MiddlewareDecoratorOptions } from '../interfaces';
 /**
  * 中间件装饰器
  */
-export declare function Middleware(scope?: MiddlewareScope): (target: Constructor<any>) => any;
+export declare function Middleware(options?: MiddlewareDecoratorOptions): (target: Constructor<any>) => void;

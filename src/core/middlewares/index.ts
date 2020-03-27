@@ -1,2 +1,2 @@
-export { EraMiddleware } from '../interfaces/middleware';
-export * from './body.middleware';
+export { EraMiddleware } from '../interfaces';
+export * from './Body.Middleware';

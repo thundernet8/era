@@ -1,5 +1,5 @@
-import { Constructor } from '../interfaces/constructor';
+import { Constructor } from '../interfaces';
 /**
  * 服务装饰器
  */
-export declare function Service(): (target: Constructor<any>) => any;
+export declare function Service(): (target: Constructor<any>) => void;
