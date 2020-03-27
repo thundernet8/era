@@ -4,7 +4,7 @@ import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
 import { AppOption } from './core/interfaces';
-import { Logger, EraMiddleware } from './core';
+import { Logger } from './core';
 export * from './core';
 export interface EraApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
     test: number;
@@ -36,9 +36,6 @@ export declare class EraApplication<StateT = RawStateT, ContextT = RawContextT> 
     middlewareLogger: Logger;
     config: RawConfigT & AppOption;
     readonly projectRoot: string;
-    readonly middlewares: EraMiddleware[];
-    useMiddleware(middleware: EraMiddleware): void;
-    useMiddlewares(middlewares?: EraMiddleware[]): void;
     run(options?: AppOption, beforeInit?: Function): Promise<void>;
     private init;
     private loadEnv;

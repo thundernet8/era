@@ -36,13 +36,23 @@ export class ControllerRegistry {
         routePrefix: string,
         middlewares?: Constructor<EraMiddleware>[]
     ) {
-        const controllerMetadata = this.resolveControllerMetadata(controller);
-        controllerMetadata.routePrefix = routePrefix || '/';
-        controllerMetadata.middlewares = (middlewares || []).map(middleware => {
-            return MiddlewareRegistry.getMiddleware(middleware)!;
-        });
-        // const newTarget = autoInjectable()(controller);
-        container.register(controller, controller);
+        const newTarget = autoInjectable()(controller);
+        container.register(newTarget, newTarget);
+        if (!this.controllers.get(newTarget)) {
+            const controllerMetadata = this.resolveControllerMetadata(
+                newTarget
+            );
+            controllerMetadata.routePrefix = routePrefix || '/';
+            controllerMetadata.middlewares = (middlewares || []).map(
+                middleware => {
+                    return MiddlewareRegistry.getMiddleware(middleware)!;
+                }
+            );
+
+            this.controllers.set(newTarget, controllerMetadata);
+        }
+
+        return newTarget;
     }
 
     public static registerAction(

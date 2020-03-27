@@ -7,11 +7,11 @@ import * as path from 'path';
 import merge from 'deepmerge';
 import { container } from 'tsyringe';
 import clc from 'cli-color';
+import bootstrap from './core/Bootstrap';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
 import { BaseKV, AppOption } from './core/interfaces';
-import bootstrap from './core/bootstrap';
 import { Logger, EraMiddleware, DIException } from './core';
 
 const yellow = clc.xterm(3);
@@ -64,38 +64,6 @@ export class EraApplication<
     config!: RawConfigT & AppOption;
 
     readonly projectRoot: string = path.resolve(process.cwd());
-
-    readonly middlewares: EraMiddleware[] = [];
-
-    useMiddleware(middleware: EraMiddleware) {
-        if (this.middlewares.indexOf(middleware) < 0) {
-            this.middlewares.push(middleware);
-            const middlewareInstance = container.resolve<EraMiddleware>(
-                middleware as any
-            );
-            if (typeof middlewareInstance.use !== 'function') {
-                throw new DIException(
-                    `The middleware class ${middleware.name} cannot be resolved`
-                );
-            }
-            // try {
-            //     isMiddlewareMatchScope(middlewareInstance, 'Method');
-            // } catch (e) {
-            //     this.logger.error(e.message, e.stack, 'Middleware');
-            //     throw e;
-            // }
-            this.use(middlewareInstance.use);
-            this.middlewareLogger.log(
-                `Apply middleware ${yellow(middleware.name)} to app`
-            );
-        }
-    }
-
-    useMiddlewares(middlewares: EraMiddleware[] = []) {
-        for (const middleware of middlewares) {
-            this.useMiddleware(middleware);
-        }
-    }
 
     async run(options?: AppOption, beforeInit?: Function) {
         try {

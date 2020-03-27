@@ -5,7 +5,7 @@ declare class ServiceMetadata {
 }
 export declare class ServiceRegistry {
     private static services;
-    static register(type: Constructor): void;
+    static register(type: Constructor): any;
     static resolve(type: Constructor): IService;
     static getServices(): ServiceMetadata[];
 }

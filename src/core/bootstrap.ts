@@ -1,6 +1,13 @@
+import { container } from 'tsyringe';
+container.register(String, {
+    useValue: ''
+});
+container.register(Boolean, {
+    useValue: false
+});
+
 import * as path from 'path';
 import Router from 'koa-router';
-import { container } from 'tsyringe';
 import clc from 'cli-color';
 import { EraApplication } from '../app';
 import { ActionExecutor } from './helpers';
@@ -13,15 +20,6 @@ import {
 } from './registry';
 
 const yellow = clc.xterm(3);
-
-function registerPrimitiveTypes() {
-    container.register(String, {
-        useValue: ''
-    });
-    container.register(Boolean, {
-        useValue: false
-    });
-}
 
 function loadMiddlewares(app: EraApplication) {
     const logger = new Logger('Bootstrap<Middleware>');
@@ -39,7 +37,8 @@ function loadMiddlewares(app: EraApplication) {
             router.all(middlewareMetadata.paths, middleware);
         } catch (e) {
             throw new DIException(
-                `The middleware class:[${middlewareMetadata.type.name}] cannot be resolved`
+                `The middleware class:[${middlewareMetadata.type.name}] cannot be resolved`,
+                e
             );
         }
     }
@@ -58,8 +57,10 @@ function loadServices() {
         try {
             ServiceRegistry.resolve(serviceMetadata.type);
         } catch (e) {
+            console.log('e', e);
             throw new DIException(
-                `The service class:[${serviceMetadata.type.name}] cannot be resolved`
+                `The service class:[${serviceMetadata.type.name}] cannot be resolved`,
+                e
             );
         }
     }
@@ -78,7 +79,8 @@ function loadControllers(app: EraApplication) {
             ControllerRegistry.resolveController(controllerMetadata.type);
         } catch (e) {
             throw new DIException(
-                `The controller class:[${controllerMetadata.type.name}] cannot be resolved`
+                `The controller class:[${controllerMetadata.type.name}] cannot be resolved`,
+                e
             );
         }
         const routePrefix = controllerMetadata.routePrefix;
@@ -129,5 +131,3 @@ export default function bootstrap(app: EraApplication) {
     loadServices();
     loadControllers(app);
 }
-
-registerPrimitiveTypes();

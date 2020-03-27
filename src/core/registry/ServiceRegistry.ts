@@ -13,13 +13,15 @@ export class ServiceRegistry {
     private static services: Map<Constructor, ServiceMetadata> = new Map();
 
     public static register(type: Constructor) {
-        // const newTarget = autoInjectable()(type);
-        // container.register(newTarget, newTarget);
-        container.register(type, type);
-        if (!this.services.get(type)) {
-            const metadata = new ServiceMetadata(type);
-            this.services.set(type, metadata);
+        const newTarget = autoInjectable()(type);
+        container.register(newTarget, newTarget);
+        // container.register(type, newTarget);
+        if (!this.services.get(newTarget)) {
+            const metadata = new ServiceMetadata(newTarget);
+            this.services.set(newTarget, metadata);
         }
+
+        return newTarget;
     }
 
     public static resolve(type: Constructor) {
