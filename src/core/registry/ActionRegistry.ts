@@ -70,6 +70,13 @@ export class ActionMetadata {
 
     public readonly type: Constructor;
 
+    /**
+     * 中间件的use方法一般不会用方法装饰器，则无法反射获得参数类型信息
+     * 中间件的use方法参数默认固定ctx、next
+     * 用此属性来标识中间件use方法进行特别处理
+     */
+    public isMiddlewareAction: boolean;
+
     public routes: ActionRoute[];
 
     private _params: Map<number, ActionParamMetadata>;
@@ -82,10 +89,6 @@ export class ActionMetadata {
         this._params = value;
     }
 
-    // get httpMethodAndPaths(): HTTPMethodAndPath[] {
-    //     return this._httpMethodAndPaths;
-    // }
-
     constructor(
         type: Constructor,
         actionName: string,
@@ -93,6 +96,7 @@ export class ActionMetadata {
     ) {
         this.type = type;
         this.actionName = actionName;
+        this.isMiddlewareAction = false;
 
         if (typeof params !== 'undefined') {
             this._params = params;

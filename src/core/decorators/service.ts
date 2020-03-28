@@ -6,6 +6,6 @@ import { ServiceRegistry } from '../registry';
  */
 export function Service() {
     return (target: Constructor<any>) => {
-        return ServiceRegistry.register(target);
+        ServiceRegistry.register(target);
     };
 }

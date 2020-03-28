@@ -11,7 +11,7 @@ export declare class MiddlewareMetadata {
 }
 export declare class MiddlewareRegistry {
     private static middlewares;
-    static register(type: Constructor, options: MiddlewareDecoratorOptions): any;
+    static register(type: Constructor, options: MiddlewareDecoratorOptions): Constructor<any>;
     static getMiddlewares(appConfig: IEraConfig): MiddlewareMetadata[];
     static getMiddleware(type: Constructor): MiddlewareMetadata | undefined;
 }

@@ -7,6 +7,6 @@ import { MiddlewareRegistry } from '../registry';
  */
 export function Middleware(options: MiddlewareDecoratorOptions = {}) {
     return (target: Constructor<any>) => {
-        return MiddlewareRegistry.register(target, options);
+        MiddlewareRegistry.register(target, options);
     };
 }

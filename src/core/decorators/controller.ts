@@ -18,7 +18,7 @@ export function Controller(
     options: ControllerDecoratorOptions = {}
 ) {
     return (target: Constructor<any>) => {
-        return ControllerRegistry.registerController(
+        ControllerRegistry.registerController(
             target,
             normalizePath(prefix),
             options.middlewares || []

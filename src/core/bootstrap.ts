@@ -79,7 +79,6 @@ function loadServices(app: EraApplication) {
         try {
             ServiceRegistry.resolve(serviceMetadata.type);
         } catch (e) {
-            console.log('e', e);
             throw new DIException(
                 `The service class:[${serviceMetadata.type.name}] cannot be resolved`,
                 e

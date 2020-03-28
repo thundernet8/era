@@ -1,4 +1,4 @@
-import { autoInjectable, container } from 'tsyringe';
+import { autoInjectable, injectable, container } from 'tsyringe';
 import {
     Constructor,
     EraMiddleware,
@@ -36,11 +36,11 @@ export class ControllerRegistry {
         routePrefix: string,
         middlewares?: Constructor<EraMiddleware>[]
     ) {
-        const newTarget = autoInjectable()(controller);
-        container.register(newTarget, newTarget);
-        if (!this.controllers.get(newTarget)) {
+        injectable()(controller);
+        container.register(controller, controller);
+        if (!this.controllers.get(controller)) {
             const controllerMetadata = this.resolveControllerMetadata(
-                newTarget
+                controller
             );
             controllerMetadata.routePrefix = routePrefix || '/';
             controllerMetadata.middlewares = (middlewares || []).map(
@@ -49,10 +49,10 @@ export class ControllerRegistry {
                 }
             );
 
-            this.controllers.set(newTarget, controllerMetadata);
+            this.controllers.set(controller, controllerMetadata);
         }
 
-        return newTarget;
+        return controller;
     }
 
     public static registerAction(

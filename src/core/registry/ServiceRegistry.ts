@@ -1,4 +1,4 @@
-import { autoInjectable, container } from 'tsyringe';
+import { injectable, container } from 'tsyringe';
 import { Constructor, IService } from '../interfaces';
 
 class ServiceMetadata {
@@ -13,15 +13,14 @@ export class ServiceRegistry {
     private static services: Map<Constructor, ServiceMetadata> = new Map();
 
     public static register(type: Constructor) {
-        const newTarget = autoInjectable()(type);
-        container.register(newTarget, newTarget);
-        // container.register(type, newTarget);
-        if (!this.services.get(newTarget)) {
-            const metadata = new ServiceMetadata(newTarget);
-            this.services.set(newTarget, metadata);
+        injectable()(type);
+        container.register(type, type);
+        if (!this.services.get(type)) {
+            const metadata = new ServiceMetadata(type);
+            this.services.set(type, metadata);
         }
 
-        return newTarget;
+        return type;
     }
 
     public static resolve(type: Constructor) {

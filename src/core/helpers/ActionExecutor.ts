@@ -13,7 +13,7 @@ export class ActionExecutor {
         ctx: IEraContext,
         next: Function
     ) {
-        const args: any[] = [];
+        let args: any[] = [];
         /**
          * 未被装饰器装饰的参数，第一个为ctx，第二个为next，其他为undefined
          */
@@ -37,6 +37,10 @@ export class ActionExecutor {
                 }
             }
         });
+
+        if (args.length < 1 && actionMetadata.isMiddlewareAction) {
+            args = [ctx, next];
+        }
 
         const instance = container.resolve(actionMetadata.type);
         if (

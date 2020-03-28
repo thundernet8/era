@@ -1,4 +1,4 @@
-import { container, autoInjectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 import {
     Constructor,
     MiddlewareDecoratorOptions,
@@ -57,24 +57,18 @@ export class MiddlewareRegistry {
         type: Constructor,
         options: MiddlewareDecoratorOptions
     ) {
-        const newTarget = autoInjectable()(type);
-        container.register(newTarget, newTarget);
-        let middlewareMetadata = this.middlewares.get(newTarget);
+        injectable()(type);
+        container.register(type, type);
+        let middlewareMetadata = this.middlewares.get(type);
         if (!middlewareMetadata) {
-            container.register(newTarget, newTarget);
-            const action = ActionRegistry.resolveActionMetadata(
-                newTarget,
-                'use'
-            );
-            middlewareMetadata = new MiddlewareMetadata(
-                newTarget,
-                action,
-                options
-            );
-            this.middlewares.set(newTarget, middlewareMetadata);
+            container.register(type, type);
+            const action = ActionRegistry.resolveActionMetadata(type, 'use');
+            action.isMiddlewareAction = true;
+            middlewareMetadata = new MiddlewareMetadata(type, action, options);
+            this.middlewares.set(type, middlewareMetadata);
         }
 
-        return newTarget;
+        return type;
     }
 
     // public static resolve(type: Constructor) {

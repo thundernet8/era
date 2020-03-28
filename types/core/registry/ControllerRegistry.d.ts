@@ -10,7 +10,7 @@ declare class ControllerMetadata {
 }
 export declare class ControllerRegistry {
     private static readonly controllers;
-    static registerController(controller: Constructor, routePrefix: string, middlewares?: Constructor<EraMiddleware>[]): any;
+    static registerController(controller: Constructor, routePrefix: string, middlewares?: Constructor<EraMiddleware>[]): Constructor<any>;
     static registerAction(controller: Constructor, actionName: string, httpMethod: HttpMethod, paths: string[]): void;
     static resolveControllerMetadata(controller: Constructor): ControllerMetadata;
     static resolveController(controller: Constructor): IController;

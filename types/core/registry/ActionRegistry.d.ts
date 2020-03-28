@@ -20,6 +20,12 @@ declare class ActionParamMetadata {
 export declare class ActionMetadata {
     readonly actionName: string;
     readonly type: Constructor;
+    /**
+     * 中间件的use方法一般不会用方法装饰器，则无法反射获得参数类型信息
+     * 中间件的use方法参数默认固定ctx、next
+     * 用此属性来标识中间件use方法进行特别处理
+     */
+    isMiddlewareAction: boolean;
     routes: ActionRoute[];
     private _params;
     get params(): Map<number, ActionParamMetadata>;

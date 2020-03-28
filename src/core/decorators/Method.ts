@@ -20,7 +20,7 @@ function HttpBaseMethod(
     return (target: any, name: string) => {
         const routes = Array.isArray(route) ? route : [route];
         ControllerRegistry.registerAction(
-            target,
+            target.constructor,
             name,
             method,
             routes.map(normalizePath)
