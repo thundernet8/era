@@ -1,3 +1,3 @@
 export * from './ActionExecutor';
-export * from './scanner';
+export * from './Scanner';
 export * from './Reflection';

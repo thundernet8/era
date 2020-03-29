@@ -70,7 +70,7 @@ export class EraApplication<
             if (beforeInit && typeof beforeInit === 'function') {
                 await beforeInit();
             }
-            const port = this.config.port || 8080;
+            const port = this.config.port;
             if (!this.config.notListen) {
                 await new Promise(resolve => {
                     this.listen(port, () => {
@@ -157,6 +157,7 @@ export class EraApplication<
         } catch (e) {}
         const config = merge(merge(defaultConfig, envBasedConfig), options);
         config.env = this.env;
+        config.port = config.port || process.env.PORT || 8080;
         this.config = config as RawConfigT & AppOption;
         if (options.name) {
             this.name = options.name;
@@ -164,7 +165,7 @@ export class EraApplication<
     }
 
     private onStartUpError(e: Error) {
-        console.log(e);
+        console.error(e);
         process.exit(1);
     }
 }
@@ -180,7 +181,7 @@ export default EraApplication;
 
 declare module 'koa' {
     export class Application extends EraApplication {
-        xyz: string;
+        _customizeAppProp: string;
     }
 
     interface Request {
