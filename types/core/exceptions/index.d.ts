@@ -1,2 +1,2 @@
-export * from './di';
-export * from './http';
+export * from './Di';
+export * from './Http';

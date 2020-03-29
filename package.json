@@ -1,7 +1,7 @@
 {
     "name": "node-server",
     "version": "0.0.0",
-    "description": "node server",
+    "description": "基于koa的node server，使用typescript开发",
     "main": "index.js",
     "types": "types/index.d.ts",
     "typings": "types/index.d.ts",

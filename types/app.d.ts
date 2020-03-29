@@ -50,7 +50,7 @@ export declare const Era: EraConstructor;
 export default EraApplication;
 declare module 'koa' {
     class Application extends EraApplication {
-        xyz: string;
+        _customizeAppProp: string;
     }
     interface Request {
         body?: any;
