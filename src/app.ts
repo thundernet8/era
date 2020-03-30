@@ -10,8 +10,9 @@ import bootstrap from './core/Bootstrap';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
-import { BaseKV, AppOption } from './core/interfaces';
+import { BaseKV, AppOption, EraFilter } from './core/interfaces';
 import { Logger } from './core';
+import { FilterRegistry } from './core/registry';
 
 const yellow = clc.xterm(3);
 
@@ -64,7 +65,11 @@ export class EraApplication<
 
     readonly projectRoot: string = path.resolve(process.cwd());
 
-    async run(options?: AppOption, beforeInit?: Function) {
+    public useFilter(filter: EraFilter) {
+        FilterRegistry.registerForGlobal(filter);
+    }
+
+    public async run(options?: AppOption, beforeInit?: Function) {
         try {
             await this.init(options);
             if (beforeInit && typeof beforeInit === 'function') {

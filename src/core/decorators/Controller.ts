@@ -1,12 +1,21 @@
-import { HttpMethod, Constructor, EraMiddleware } from '../interfaces';
-import { ControllerRegistry } from '../registry';
+import {
+    HttpMethod,
+    Constructor,
+    EraMiddleware,
+    EraFilter
+} from '../interfaces';
+import { ControllerRegistry, FilterRegistry } from '../registry';
 import { normalizePath } from '../utils';
 
 interface ControllerDecoratorOptions {
     /**
      * 控制器scoped的中间件
      */
-    middlewares?: Constructor<EraMiddleware>[];
+    middlewares?: EraMiddleware[];
+    /**
+     * 控制器scoped的过滤器
+     */
+    filters?: EraFilter[];
 }
 
 /**
@@ -23,5 +32,10 @@ export function Controller(
             normalizePath(prefix),
             options.middlewares || []
         );
+        if (options.filters && options.filters.length > 0) {
+            for (const filter of options.filters) {
+                FilterRegistry.registerForController(target, filter);
+            }
+        }
     };
 }

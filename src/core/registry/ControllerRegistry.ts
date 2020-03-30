@@ -34,7 +34,7 @@ export class ControllerRegistry {
     public static registerController(
         controller: Constructor,
         routePrefix: string,
-        middlewares?: Constructor<EraMiddleware>[]
+        middlewares?: EraMiddleware[]
     ) {
         injectable()(controller);
         container.register(controller, controller);
@@ -44,9 +44,7 @@ export class ControllerRegistry {
             );
             controllerMetadata.routePrefix = routePrefix || '/';
             controllerMetadata.middlewares = (middlewares || []).map(
-                middleware => {
-                    return MiddlewareRegistry.getMiddleware(middleware)!;
-                }
+                MiddlewareRegistry.getMiddleware
             );
 
             this.controllers.set(controller, controllerMetadata);

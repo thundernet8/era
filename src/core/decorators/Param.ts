@@ -6,7 +6,7 @@ function registerParam(
     paramType: ParamType,
     action: string,
     index: number,
-    expression: string,
+    expression?: string,
     options?: ParamDecoratorOptions
 ) {
     ActionRegistry.registerParam(
@@ -14,24 +14,14 @@ function registerParam(
         action,
         index,
         paramType,
-        expression,
+        expression || '',
         options
     );
 }
 
-export function ContextParam(
-    expression: string,
-    options?: ParamDecoratorOptions
-) {
+export function ContextParam() {
     return (target: any, action: string, index: number) => {
-        registerParam(
-            target.constructor,
-            ParamType.Context,
-            action,
-            index,
-            expression,
-            options
-        );
+        registerParam(target.constructor, ParamType.Context, action, index);
     };
 }
 
@@ -41,7 +31,10 @@ export function NextParam() {
     };
 }
 
-export function PathParam(expression: string, options?: ParamDecoratorOptions) {
+export function PathParam(
+    expression?: string,
+    options?: ParamDecoratorOptions
+) {
     return (target: any, action: string, index: number) => {
         registerParam(
             target.constructor,
@@ -55,7 +48,7 @@ export function PathParam(expression: string, options?: ParamDecoratorOptions) {
 }
 
 export function QueryParam(
-    expression: string,
+    expression?: string,
     options?: ParamDecoratorOptions
 ) {
     return (target: any, action: string, index: number) => {
@@ -87,7 +80,7 @@ export function BodyParam(
 }
 
 export function HeaderParam(
-    expression: string,
+    expression?: string,
     options?: ParamDecoratorOptions
 ) {
     return (target: any, action: string, index: number) => {

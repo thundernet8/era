@@ -1,4 +1,3 @@
-import { autoInjectable, container } from 'tsyringe';
 import { Constructor, MiddlewareDecoratorOptions } from '../interfaces';
 import { MiddlewareRegistry } from '../registry';
 

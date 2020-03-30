@@ -16,7 +16,8 @@ import { Logger } from './services';
 import {
     MiddlewareRegistry,
     ServiceRegistry,
-    ControllerRegistry
+    ControllerRegistry,
+    FilterRegistry
 } from './registry';
 
 const yellow = clc.xterm(3);
@@ -129,6 +130,14 @@ function loadControllers(app: EraApplication) {
             const actionHandler = (ctx, next) => {
                 ActionExecutor.exec(action, ctx, next);
             };
+            const beforeFilters = FilterRegistry.getBeforeFilters(
+                controllerMetadata.type,
+                action.actionName
+            ).map(FilterRegistry.resolveFilterHandler);
+            const afterFilters = FilterRegistry.getAfterFilters(
+                controllerMetadata.type,
+                action.actionName
+            ).map(FilterRegistry.resolveFilterHandler);
             for (const route of routes) {
                 const fullPath = `${route.method.toUpperCase()} ${path.join(
                     controllerMetadata.routePrefix,
@@ -137,8 +146,10 @@ function loadControllers(app: EraApplication) {
                 logger.log(`+ Register route: ${yellow(fullPath)}`);
                 subRouter[route.method](
                     route.path,
+                    ...(beforeFilters as any),
                     ...controllerMiddlewares,
-                    actionHandler
+                    actionHandler,
+                    ...(afterFilters as any)
                 );
             }
         }

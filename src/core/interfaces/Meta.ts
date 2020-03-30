@@ -6,11 +6,8 @@ export enum ParamType {
     Body,
     File,
     Header,
-    Request,
-    Response,
     Context,
-    Next,
-    Error
+    Next
 }
 
 export enum HttpMethod {
@@ -27,9 +24,4 @@ export enum HttpMethod {
 export interface ActionRoute {
     method: HttpMethod;
     path: string;
-}
-
-export interface EraMiddleware {
-    name?: string;
-    use(ctx: IEraContext, next: Function): void;
 }
