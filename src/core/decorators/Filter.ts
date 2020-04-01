@@ -1,21 +1,25 @@
 import {
     FilterDecoratorOptions,
     EraFilter,
-    EraFilterClass
+    EraFilterClass,
+    Constructor
 } from '../interfaces';
 import { FilterRegistry } from '../registry';
-import { isClass } from '../utils';
-import { isObject } from 'util';
+import { isClass, isObject } from '../utils';
 
 /**
  * 过滤器装饰器
  */
 export function Filter(options: FilterDecoratorOptions = {}) {
-    return (target: EraFilterClass) => {
+    return (target: Constructor<EraFilterClass>) => {
         FilterRegistry.register(target, options);
     };
 }
 
+/**
+ * 为控制器或控制器方法添加过滤器
+ * @param filter
+ */
 export function useFilter(filter: EraFilter) {
     return (target: any, name?: string, ...rest) => {
         if (isClass(target)) {
@@ -27,7 +31,11 @@ export function useFilter(filter: EraFilter) {
             typeof target[name] === 'function' &&
             rest.length === 0
         ) {
-            FilterRegistry.registerForAction(target.constructor, name, filter);
+            FilterRegistry.registerForAction(
+                target.constructor as Constructor,
+                name,
+                filter
+            );
         }
         throw new Error(
             `useFilter decorator can only be use for a class or a method of class`

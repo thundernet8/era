@@ -10,9 +10,9 @@ import bootstrap from './core/Bootstrap';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
-import { BaseKV, AppOption, EraFilter } from './core/interfaces';
+import { BaseKV, AppOption, EraFilter, EraMiddleware } from './core/interfaces';
 import { Logger } from './core';
-import { FilterRegistry } from './core/registry';
+import { FilterRegistry, MiddlewareRegistry } from './core/registry';
 
 const yellow = clc.xterm(3);
 
@@ -67,6 +67,10 @@ export class EraApplication<
 
     public useFilter(filter: EraFilter) {
         FilterRegistry.registerForGlobal(filter);
+    }
+
+    public useMiddleware(middleware: EraMiddleware) {
+        MiddlewareRegistry.registerForGlobal(middleware);
     }
 
     public async run(options?: AppOption, beforeInit?: Function) {

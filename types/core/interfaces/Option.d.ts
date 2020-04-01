@@ -40,4 +40,19 @@ export interface MiddlewareDecoratorOptions {
     enable?: boolean | MiddlewareEnableFunction;
 }
 declare type MiddlewareEnableFunction = (config: IEraConfig) => boolean;
+export interface FilterDecoratorOptions {
+    /**
+     * 过滤器优先级，数值越低优先被执行，默认10
+     */
+    priority?: number;
+    /**
+     * 路由匹配，使用koa路由格式
+     */
+    match?: string[];
+    /**
+     * 过滤器作用于请求上下文位置，默认before，即在请求处理前
+     */
+    position?: FilterPosition;
+}
+export declare type FilterPosition = 'before' | 'after';
 export {};

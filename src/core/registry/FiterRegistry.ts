@@ -72,15 +72,15 @@ export class FilterRegistry {
         let filterMetadata = this.filters.get(type);
         if (!filterMetadata) {
             if (isClass(type)) {
-                injectable()(type as EraFilterClass);
+                injectable()(type as Constructor<EraFilterClass>);
                 container.register(
-                    type as EraFilterClass,
-                    type as EraFilterClass
+                    type as Constructor<EraFilterClass>,
+                    type as Constructor<EraFilterClass>
                 );
             }
             const action = isClass(type)
                 ? ActionRegistry.resolveActionMetadata(
-                      type as EraFilterClass,
+                      type as Constructor<EraFilterClass>,
                       'use'
                   )
                 : (type as EraFilterFunction);
@@ -181,7 +181,7 @@ export class FilterRegistry {
         if (typeof filter.action === 'function') {
             return filter.type as EraFilterFunction;
         }
-        return (ctx, next) => {
+        return async (ctx, next) => {
             ActionExecutor.exec(filter.action as ActionMetadata, ctx, next);
         };
     }

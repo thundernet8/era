@@ -38,16 +38,17 @@ function loadMiddlewares(app: EraApplication) {
     logger.log(`Scan middlewares from directory: ${yellow(middlewareDir)}`);
     scan(middlewareDir, '**/*.middleware.{js,ts}');
 
-    const middlewareMetadatas = MiddlewareRegistry.getMiddlewares(app.config);
+    const middlewareMetadatas = MiddlewareRegistry.getGlobalMiddlewares(
+        app.config
+    );
     const router = new Router();
     for (const middlewareMetadata of middlewareMetadatas) {
         logger.log(`+ Load middleware ${yellow(middlewareMetadata.type.name)}`);
         try {
-            const actionMetadata = middlewareMetadata.action;
-            const middleware = (ctx, next) => {
-                ActionExecutor.exec(actionMetadata, ctx, next);
-            };
-            router.all(middlewareMetadata.paths, middleware);
+            const middleware = MiddlewareRegistry.resolveMiddlewareHandler(
+                middlewareMetadata
+            );
+            router.all(middlewareMetadata.paths, middleware as any);
         } catch (e) {
             throw new DIException(
                 `The middleware class:[${middlewareMetadata.type.name}] cannot be resolved`,
@@ -111,15 +112,11 @@ function loadControllers(app: EraApplication) {
             );
         }
         const routePrefix = controllerMetadata.routePrefix;
-        const controllerMiddlewareMetadatas =
-            controllerMetadata.middlewares || [];
+        const controllerMiddlewareMetadatas = MiddlewareRegistry.getControllerMiddlewares(
+            controllerMetadata.type
+        );
         const controllerMiddlewares = controllerMiddlewareMetadatas.map(
-            metadata => {
-                const actionMetadata = metadata.action;
-                return (ctx, next) => {
-                    ActionExecutor.exec(actionMetadata, ctx, next);
-                };
-            }
+            MiddlewareRegistry.resolveMiddlewareHandler
         );
         const subRouter = new Router({
             prefix: routePrefix
@@ -147,7 +144,7 @@ function loadControllers(app: EraApplication) {
                 subRouter[route.method](
                     route.path,
                     ...(beforeFilters as any),
-                    ...controllerMiddlewares,
+                    ...(controllerMiddlewares as any),
                     actionHandler,
                     ...(afterFilters as any)
                 );

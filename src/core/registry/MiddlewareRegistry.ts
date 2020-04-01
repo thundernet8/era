@@ -57,84 +57,97 @@ export class MiddlewareRegistry {
         MiddlewareMetadata
     > = new Map();
 
-    private static globalUsedFilters: MiddlewareMetadata[] = [];
+    private static globalUsedMiddlewares: MiddlewareMetadata[] = [];
 
-    private static controllerUsedFilters: Map<
+    private static controllerUsedMiddlewares: Map<
         Constructor,
         MiddlewareMetadata[]
     > = new Map();
 
     public static register(
         type: EraMiddleware,
-        options: MiddlewareDecoratorOptions
+        options: MiddlewareDecoratorOptions = {}
     ) {
         let middlewareMetadata = this.middlewares.get(type);
         if (!middlewareMetadata) {
             if (isClass(type)) {
-                injectable()(type as EraMiddlewareClass);
+                injectable()(type as Constructor<EraMiddlewareClass>);
                 container.register(
-                    type as EraMiddlewareClass,
-                    type as EraMiddlewareClass
+                    type as Constructor<EraMiddlewareClass>,
+                    type as Constructor<EraMiddlewareClass>
                 );
             }
             const action = isClass(type)
                 ? ActionRegistry.resolveActionMetadata(
-                      type as EraMiddlewareClass,
+                      type as Constructor<EraMiddlewareClass>,
                       'use'
                   )
                 : (type as EraMiddlewareFunction);
-            // action.isMiddlewareAction = true; // TODO
+            if (action instanceof ActionMetadata) {
+                action.isMiddlewareAction = true;
+            }
             middlewareMetadata = new MiddlewareMetadata(type, action, options);
             this.middlewares.set(type, middlewareMetadata);
         }
     }
 
     private static resolveMiddlewareMetadata(middleware: EraMiddleware) {
-        let filterMetadata = this.middlewares.get(middleware);
-        if (!filterMetadata) {
-            this.register(filter);
-            filterMetadata = this.filters.get(filter);
+        let middlewareMetadata = this.middlewares.get(middleware);
+        if (!middlewareMetadata) {
+            this.register(middleware);
+            middlewareMetadata = this.middlewares.get(middleware);
         }
 
-        return filterMetadata;
+        return middlewareMetadata;
     }
 
     public static registerForGlobal(middleware: EraMiddleware) {
-        const filterMetadata = this.resolveMiddlewareMetadata(filter);
+        const middlewareMetadata = this.resolveMiddlewareMetadata(middleware);
         if (
-            filterMetadata &&
-            this.globalUsedFilters.indexOf(filterMetadata) < 0
+            middlewareMetadata &&
+            this.globalUsedMiddlewares.indexOf(middlewareMetadata) < 0
         ) {
-            this.globalUsedFilters.push(filterMetadata);
+            this.globalUsedMiddlewares.push(middlewareMetadata);
         }
     }
 
     public static registerForController(
         controller: Constructor,
-        filter: EraFilter
+        middleware: EraMiddleware
     ) {
-        const filterMetadata = this.resolveFilterMetadata(filter);
-        if (filterMetadata) {
-            const controllerFilterMetadatas =
-                this.controllerUsedFilters.get(controller) || [];
-            if (controllerFilterMetadatas.indexOf(filterMetadata) < 0) {
-                controllerFilterMetadatas.push(filterMetadata);
+        const middlewareMetadata = this.resolveMiddlewareMetadata(middleware);
+        if (middlewareMetadata) {
+            const controllerMiddlewareMetadatas =
+                this.controllerUsedMiddlewares.get(controller) || [];
+            if (controllerMiddlewareMetadatas.indexOf(middlewareMetadata) < 0) {
+                controllerMiddlewareMetadatas.push(middlewareMetadata);
             }
-            this.controllerUsedFilters.set(
+            this.controllerUsedMiddlewares.set(
                 controller,
-                controllerFilterMetadatas
+                controllerMiddlewareMetadatas
             );
         }
     }
 
-    public static getMiddlewares(appConfig: IEraConfig) {
+    public static getGlobalMiddlewares(appConfig: IEraConfig) {
         const middlewares: MiddlewareMetadata[] = [];
+        // 默认启用的中间件作为全局中间件
         this.middlewares.forEach(middleware => {
             if (middleware.checkEnable(appConfig)) {
                 middlewares.push(middleware);
             }
         });
+        // app.useMiddleware注册的中间件强制启用并作为全局中间件
+        this.globalUsedMiddlewares.forEach(middleware => {
+            if (middlewares.indexOf(middleware) < 0) {
+                middlewares.push(middleware);
+            }
+        });
         return middlewares.sort((a, b) => a.priority - b.priority);
+    }
+
+    public static getControllerMiddlewares(controller: Constructor) {
+        return this.controllerUsedMiddlewares.get(controller) || [];
     }
 
     public static getMiddleware(type: EraMiddleware) {
@@ -147,7 +160,7 @@ export class MiddlewareRegistry {
         if (typeof middleware.action === 'function') {
             return middleware.type as EraMiddlewareFunction;
         }
-        return (ctx, next) => {
+        return async (ctx, next) => {
             ActionExecutor.exec(middleware.action as ActionMetadata, ctx, next);
         };
     }

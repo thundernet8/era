@@ -1,17 +1,24 @@
-import { Constructor, MiddlewareDecoratorOptions } from '../interfaces';
+import { Constructor, MiddlewareDecoratorOptions, EraMiddleware, EraMiddlewareFunction } from '../interfaces';
 import { ActionMetadata } from './ActionRegistry';
 import { IEraConfig } from '../../config';
 export declare class MiddlewareMetadata {
-    readonly type: Constructor;
+    readonly type: EraMiddleware;
     readonly paths: string[];
     priority: number;
     readonly checkEnable: (...args: any[]) => boolean;
-    readonly action: ActionMetadata;
-    constructor(type: Constructor, action: ActionMetadata, options?: MiddlewareDecoratorOptions);
+    readonly action: ActionMetadata | Function;
+    constructor(type: EraMiddleware, action: ActionMetadata | Function, options?: MiddlewareDecoratorOptions);
 }
 export declare class MiddlewareRegistry {
     private static middlewares;
-    static register(type: Constructor, options: MiddlewareDecoratorOptions): Constructor<any>;
-    static getMiddlewares(appConfig: IEraConfig): MiddlewareMetadata[];
-    static getMiddleware(type: Constructor): MiddlewareMetadata | undefined;
+    private static globalUsedMiddlewares;
+    private static controllerUsedMiddlewares;
+    static register(type: EraMiddleware, options?: MiddlewareDecoratorOptions): void;
+    private static resolveMiddlewareMetadata;
+    static registerForGlobal(middleware: EraMiddleware): void;
+    static registerForController(controller: Constructor, middleware: EraMiddleware): void;
+    static getGlobalMiddlewares(appConfig: IEraConfig): MiddlewareMetadata[];
+    static getControllerMiddlewares(controller: Constructor): MiddlewareMetadata[];
+    static getMiddleware(type: EraMiddleware): MiddlewareMetadata | undefined;
+    static resolveMiddlewareHandler(middleware: MiddlewareMetadata): EraMiddlewareFunction;
 }

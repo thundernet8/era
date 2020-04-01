@@ -13,14 +13,14 @@ class ControllerMetadata {
 
     public routePrefix: string;
 
-    public middlewares: MiddlewareMetadata[];
+    // public middlewares: MiddlewareMetadata[];
 
     public readonly actions: Map<string, ActionMetadata>;
 
     constructor(type: Constructor) {
         this.type = type;
         this.routePrefix = '';
-        this.middlewares = [];
+        // this.middlewares = [];
         this.actions = new Map();
     }
 }
@@ -34,7 +34,7 @@ export class ControllerRegistry {
     public static registerController(
         controller: Constructor,
         routePrefix: string,
-        middlewares?: EraMiddleware[]
+        middlewares: EraMiddleware[] = []
     ) {
         injectable()(controller);
         container.register(controller, controller);
@@ -43,9 +43,12 @@ export class ControllerRegistry {
                 controller
             );
             controllerMetadata.routePrefix = routePrefix || '/';
-            controllerMetadata.middlewares = (middlewares || []).map(
-                MiddlewareRegistry.getMiddleware
-            );
+            for (const middleware of middlewares) {
+                MiddlewareRegistry.registerForController(
+                    controller,
+                    middleware
+                );
+            }
 
             this.controllers.set(controller, controllerMetadata);
         }

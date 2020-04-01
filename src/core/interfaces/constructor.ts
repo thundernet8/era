@@ -15,20 +15,28 @@ export interface IService {
     app: EraApplication;
 }
 
-export interface EraMiddlewareClass extends Constructor {
+export interface EraMiddlewareClass {
     name?: string;
     use: EraMiddlewareFunction;
 }
 
-export type EraMiddlewareFunction = (ctx: IEraContext, next: Function) => void;
+export type EraMiddlewareFunction = (
+    ctx: IEraContext,
+    next: Function
+) => Promise<any>;
 
-export type EraMiddleware = EraMiddlewareClass | EraMiddlewareFunction;
+export type EraMiddleware =
+    | Constructor<EraMiddlewareClass>
+    | EraMiddlewareFunction;
 
-export interface EraFilterClass extends Constructor {
+export interface EraFilterClass {
     name?: string;
     use: EraFilterFunction;
 }
 
-export type EraFilterFunction = (ctx: IEraContext, next: Function) => void;
+export type EraFilterFunction = (
+    ctx: IEraContext,
+    next: Function
+) => Promise<any>;
 
-export type EraFilter = EraFilterClass | EraFilterFunction;
+export type EraFilter = Constructor<EraFilterClass> | EraFilterFunction;

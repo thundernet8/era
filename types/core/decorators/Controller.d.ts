@@ -1,9 +1,13 @@
-import { Constructor, EraMiddleware } from '../interfaces';
+import { Constructor, EraMiddleware, EraFilter } from '../interfaces';
 interface ControllerDecoratorOptions {
     /**
      * 控制器scoped的中间件
      */
-    middlewares?: Constructor<EraMiddleware>[];
+    middlewares?: EraMiddleware[];
+    /**
+     * 控制器scoped的过滤器
+     */
+    filters?: EraFilter[];
 }
 /**
  * 控制器装饰器
