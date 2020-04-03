@@ -5,7 +5,7 @@ import { IEraState } from './state';
 export interface IEraContext extends IRouterParamContext<IEraState> {}
 
 export interface IEraContext extends Koa.Context {
-    // params: any;
+    requestId: string;
     _customizeContextProp: string;
     [key: string]: any;
 }

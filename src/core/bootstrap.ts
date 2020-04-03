@@ -10,14 +10,15 @@ import * as path from 'path';
 import Router from 'koa-router';
 import clc from 'cli-color';
 import { EraApplication } from '../app';
-import { ActionExecutor, scan } from './helpers';
+import { ActionExecutor, scan, FilterExecutor } from './helpers';
 import { DIException } from './exceptions';
 import { Logger } from './services';
 import {
     MiddlewareRegistry,
     ServiceRegistry,
     ControllerRegistry,
-    FilterRegistry
+    FilterRegistry,
+    InterceptorRegistry
 } from './registry';
 
 const yellow = clc.xterm(3);
@@ -125,16 +126,27 @@ function loadControllers(app: EraApplication) {
         for (const action of actions) {
             const { routes } = action;
             const actionHandler = (ctx, next) => {
-                ActionExecutor.exec(action, ctx, next);
+                return ActionExecutor.exec(action, ctx, next);
             };
-            const beforeFilters = FilterRegistry.getBeforeFilters(
+
+            const interceptors = InterceptorRegistry.getInterceptors(
+                controllerMetadata.type,
+                action.actionName
+            ).map(InterceptorRegistry.resolveInterceptorHandler);
+
+            const exceptionFilters = FilterRegistry.getFilters(
                 controllerMetadata.type,
                 action.actionName
             ).map(FilterRegistry.resolveFilterHandler);
-            const afterFilters = FilterRegistry.getAfterFilters(
-                controllerMetadata.type,
-                action.actionName
-            ).map(FilterRegistry.resolveFilterHandler);
+
+            const filtersApplyMiddleware = async (ctx, next) => {
+                try {
+                    await next();
+                } catch (e) {
+                    FilterExecutor.applyFilters(e, ctx, exceptionFilters);
+                }
+            };
+
             for (const route of routes) {
                 const fullPath = `${route.method.toUpperCase()} ${path.join(
                     controllerMetadata.routePrefix,
@@ -143,10 +155,10 @@ function loadControllers(app: EraApplication) {
                 logger.log(`+ Register route: ${yellow(fullPath)}`);
                 subRouter[route.method](
                     route.path,
-                    ...(beforeFilters as any),
                     ...(controllerMiddlewares as any),
-                    actionHandler,
-                    ...(afterFilters as any)
+                    filtersApplyMiddleware,
+                    ...(interceptors as any),
+                    actionHandler
                 );
             }
         }

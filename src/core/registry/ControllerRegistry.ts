@@ -43,12 +43,7 @@ export class ControllerRegistry {
                 controller
             );
             controllerMetadata.routePrefix = routePrefix || '/';
-            for (const middleware of middlewares) {
-                MiddlewareRegistry.registerForController(
-                    controller,
-                    middleware
-                );
-            }
+            MiddlewareRegistry.registerForController(controller, middlewares);
 
             this.controllers.set(controller, controllerMetadata);
         }

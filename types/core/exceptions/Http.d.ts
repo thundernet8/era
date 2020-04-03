@@ -1,4 +1,17 @@
+import { HttpStatus } from '../interfaces';
 export declare class HttpException extends Error {
-    code: number;
-    constructor(msg: string, code: number);
+    status: number;
+    constructor(msg: string, status: HttpStatus, stack?: string);
+}
+export declare class ForbiddenException extends HttpException {
+    constructor(msg: string, status: HttpStatus, stack?: string);
+}
+export declare class InternalServerErrorException extends HttpException {
+    constructor(msg: string, status: HttpStatus, stack?: string);
+}
+export declare class NotFoundException extends HttpException {
+    constructor(msg: string, status: HttpStatus, stack?: string);
+}
+export declare class UnauthorizedException extends HttpException {
+    constructor(msg: string, status: HttpStatus, stack?: string);
 }

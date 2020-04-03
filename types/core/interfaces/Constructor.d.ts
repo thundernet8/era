@@ -1,5 +1,6 @@
 import { IEraContext } from '../../context';
 import EraApplication from '../../app';
+import { HttpException } from '../exceptions';
 export declare type Constructor<T = any> = {
     new (...args: any[]): T;
 };
@@ -13,13 +14,19 @@ export interface IService {
 }
 export interface EraMiddlewareClass {
     name?: string;
-    use: EraMiddlewareFunction;
+    use: EraMiddlewareLambda;
 }
-export declare type EraMiddlewareFunction = (ctx: IEraContext, next: Function) => Promise<any>;
-export declare type EraMiddleware = Constructor<EraMiddlewareClass> | EraMiddlewareFunction;
-export interface EraFilterClass {
+export declare type EraMiddlewareLambda = (ctx: IEraContext, next: Function) => Promise<any>;
+export declare type EraMiddleware = Constructor<EraMiddlewareClass> | EraMiddlewareLambda;
+export interface EraExceptionFilterClass {
     name?: string;
-    use: EraFilterFunction;
+    catch: EraExceptionFilterLambda;
 }
-export declare type EraFilterFunction = (ctx: IEraContext, next: Function) => Promise<any>;
-export declare type EraFilter = Constructor<EraFilterClass> | EraFilterFunction;
+export declare type EraExceptionFilterLambda = (exception: HttpException, ctx: IEraContext) => Promise<any> | any;
+export declare type EraFilter = Constructor<EraExceptionFilterClass> | EraExceptionFilterLambda;
+export interface EraInterceptorClass {
+    name?: string;
+    intercept: EraInterceptorLambda;
+}
+export declare type EraInterceptorLambda = (ctx: IEraContext, next: Function) => Promise<any>;
+export declare type EraInterceptor = Constructor<EraInterceptorClass> | EraInterceptorLambda;

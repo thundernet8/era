@@ -1,10 +1,10 @@
-import { FilterDecoratorOptions, EraFilter, EraFilterClass, Constructor } from '../interfaces';
+import { EraFilter } from '../interfaces';
 /**
- * 过滤器装饰器
+ * 异常过滤器装饰器
  */
-export declare function Filter(options?: FilterDecoratorOptions): (target: Constructor<EraFilterClass>) => void;
+export declare function ExceptionFilter(): (target: EraFilter) => void;
 /**
  * 为控制器或控制器方法添加过滤器
  * @param filter
  */
-export declare function useFilter(filter: EraFilter): (target: any, name?: string | undefined, ...rest: any[]) => never;
+export declare function UseFilters(...filters: EraFilter[]): (target: any, name?: string | undefined, ...rest: any[]) => never;

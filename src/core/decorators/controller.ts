@@ -23,19 +23,19 @@ interface ControllerDecoratorOptions {
  * @param prefix 路由前缀
  */
 export function Controller(
-    prefix: string = '',
-    options: ControllerDecoratorOptions = {}
+    prefix: string = ''
+    // options: ControllerDecoratorOptions = {}
 ) {
     return (target: Constructor<any>) => {
         ControllerRegistry.registerController(
             target,
-            normalizePath(prefix),
-            options.middlewares || []
+            normalizePath(prefix)
+            // options.middlewares || []
         );
-        if (options.filters && options.filters.length > 0) {
-            for (const filter of options.filters) {
-                FilterRegistry.registerForController(target, filter);
-            }
-        }
+        // if (options.filters && options.filters.length > 0) {
+        //     for (const filter of options.filters) {
+        //         FilterRegistry.registerForController(target, filter);
+        //     }
+        // }
     };
 }

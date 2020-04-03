@@ -43,6 +43,7 @@
         "koa-ejs": "^4.3.0",
         "koa-helmet": "^5.2.0",
         "koa-logger": "^3.2.1",
+        "koa-requestid": "^2.1.0",
         "koa-router": "^8.0.8",
         "koa-static": "^5.0.0",
         "path-to-regexp": "^6.1.0",

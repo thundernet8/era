@@ -4,13 +4,13 @@ import {
     FilterDecoratorOptions,
     FilterPosition,
     EraFilter,
-    EraFilterClass,
-    EraFilterFunction
+    EraExceptionFilterClass,
+    EraExceptionFilterLambda
 } from '../interfaces';
 import { IEraConfig } from '../../config';
-import { isClass } from 'core/utils';
-import { ActionMetadata, ActionRegistry } from '../../core/registry';
-import { ActionExecutor } from '../../core/helpers';
+import { isClass } from '../utils';
+import { ActionMetadata, ActionRegistry } from '../registry';
+import { ActionExecutor } from '../helpers';
 
 export class FilterMetadata {
     public readonly type: EraFilter;
@@ -72,18 +72,18 @@ export class FilterRegistry {
         let filterMetadata = this.filters.get(type);
         if (!filterMetadata) {
             if (isClass(type)) {
-                injectable()(type as Constructor<EraFilterClass>);
+                injectable()(type as Constructor<EraExceptionFilterClass>);
                 container.register(
-                    type as Constructor<EraFilterClass>,
-                    type as Constructor<EraFilterClass>
+                    type as Constructor<EraExceptionFilterClass>,
+                    type as Constructor<EraExceptionFilterClass>
                 );
             }
             const action = isClass(type)
                 ? ActionRegistry.resolveActionMetadata(
-                      type as Constructor<EraFilterClass>,
-                      'use'
+                      type as Constructor<EraExceptionFilterClass>,
+                      'catch'
                   )
-                : (type as EraFilterFunction);
+                : (type as EraExceptionFilterLambda);
             filterMetadata = new FilterMetadata(type, action, options);
             this.filters.set(type, filterMetadata);
         }
@@ -111,39 +111,41 @@ export class FilterRegistry {
 
     public static registerForController(
         controller: Constructor,
-        filter: EraFilter
+        filters: EraFilter[]
     ) {
-        const filterMetadata = this.resolveFilterMetadata(filter);
-        if (filterMetadata) {
-            const controllerFilterMetadatas =
-                this.controllerUsedFilters.get(controller) || [];
-            if (controllerFilterMetadatas.indexOf(filterMetadata) < 0) {
-                controllerFilterMetadatas.push(filterMetadata);
+        for (const filter of filters) {
+            const filterMetadata = this.resolveFilterMetadata(filter);
+            if (filterMetadata) {
+                const controllerFilterMetadatas =
+                    this.controllerUsedFilters.get(controller) || [];
+                if (controllerFilterMetadatas.indexOf(filterMetadata) < 0) {
+                    controllerFilterMetadatas.push(filterMetadata);
+                }
+                this.controllerUsedFilters.set(
+                    controller,
+                    controllerFilterMetadatas
+                );
             }
-            this.controllerUsedFilters.set(
-                controller,
-                controllerFilterMetadatas
-            );
         }
     }
 
-    public static registerForAction(
-        controller: Constructor,
-        actionName: string,
-        filter: EraFilter
-    ) {
-        const filterMetadata = this.resolveFilterMetadata(filter);
-        if (filterMetadata) {
-            const filterMetadataMap =
-                this.actionUsedFilters.get(controller) || new Map();
-            const filterMetadatas = filterMetadataMap.get(actionName) || [];
-            if (filterMetadatas.indexOf(filterMetadata) < 0) {
-                filterMetadatas.push(filterMetadata);
-            }
-            filterMetadataMap.set(actionName, filterMetadatas);
-            this.actionUsedFilters.set(controller, filterMetadataMap);
-        }
-    }
+    // public static registerForAction(
+    //     controller: Constructor,
+    //     actionName: string,
+    //     filter: EraFilter
+    // ) {
+    //     const filterMetadata = this.resolveFilterMetadata(filter);
+    //     if (filterMetadata) {
+    //         const filterMetadataMap =
+    //             this.actionUsedFilters.get(controller) || new Map();
+    //         const filterMetadatas = filterMetadataMap.get(actionName) || [];
+    //         if (filterMetadatas.indexOf(filterMetadata) < 0) {
+    //             filterMetadatas.push(filterMetadata);
+    //         }
+    //         filterMetadataMap.set(actionName, filterMetadatas);
+    //         this.actionUsedFilters.set(controller, filterMetadataMap);
+    //     }
+    // }
 
     public static getFilters(controller: Constructor, actionName: string) {
         const controllerFilters: FilterMetadata[] =
@@ -162,27 +164,16 @@ export class FilterRegistry {
         return filters.sort((a, b) => a.priority - b.priority);
     }
 
-    public static getBeforeFilters(
-        controller: Constructor,
-        actionName: string
-    ) {
-        const filters = this.getFilters(controller, actionName);
-        return filters.filter(filter => filter.position === 'before');
-    }
-
-    public static getAfterFilters(controller: Constructor, actionName: string) {
-        const filters = this.getFilters(controller, actionName);
-        return filters.filter(filter => filter.position === 'after');
-    }
-
     public static resolveFilterHandler(
         filter: FilterMetadata
-    ): EraFilterFunction {
+    ): EraExceptionFilterLambda {
         if (typeof filter.action === 'function') {
-            return filter.type as EraFilterFunction;
+            return filter.type as EraExceptionFilterLambda;
         }
-        return async (ctx, next) => {
-            ActionExecutor.exec(filter.action as ActionMetadata, ctx, next);
+        return async (exception, ctx) => {
+            const metadata = <ActionMetadata>filter.action;
+            const instance = container.resolve(metadata.type);
+            return instance[metadata.actionName](exception, ctx);
         };
     }
 }

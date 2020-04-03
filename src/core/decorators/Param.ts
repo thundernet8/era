@@ -19,22 +19,19 @@ function registerParam(
     );
 }
 
-export function ContextParam() {
+export function Context() {
     return (target: any, action: string, index: number) => {
         registerParam(target.constructor, ParamType.Context, action, index);
     };
 }
 
-export function NextParam() {
+export function Next() {
     return (target: any, action: string, index: number) => {
         registerParam(target.constructor, ParamType.Next, action, index, '');
     };
 }
 
-export function PathParam(
-    expression?: string,
-    options?: ParamDecoratorOptions
-) {
+export function Path(expression?: string, options?: ParamDecoratorOptions) {
     return (target: any, action: string, index: number) => {
         registerParam(
             target.constructor,
@@ -47,10 +44,7 @@ export function PathParam(
     };
 }
 
-export function QueryParam(
-    expression?: string,
-    options?: ParamDecoratorOptions
-) {
+export function Query(expression?: string, options?: ParamDecoratorOptions) {
     return (target: any, action: string, index: number) => {
         registerParam(
             target.constructor,
@@ -63,10 +57,7 @@ export function QueryParam(
     };
 }
 
-export function BodyParam(
-    expression?: string,
-    options?: ParamDecoratorOptions
-) {
+export function Body(expression?: string, options?: ParamDecoratorOptions) {
     return (target: any, action: string, index: number) => {
         registerParam(
             target.constructor,
@@ -79,14 +70,24 @@ export function BodyParam(
     };
 }
 
-export function HeaderParam(
-    expression?: string,
-    options?: ParamDecoratorOptions
-) {
+export function Header(expression?: string, options?: ParamDecoratorOptions) {
     return (target: any, action: string, index: number) => {
         registerParam(
             target.constructor,
             ParamType.Header,
+            action,
+            index,
+            expression,
+            options
+        );
+    };
+}
+
+export function Cookie(expression: string, options?: ParamDecoratorOptions) {
+    return (target: any, action: string, index: number) => {
+        registerParam(
+            target.constructor,
+            ParamType.Cookie,
             action,
             index,
             expression,

@@ -10,9 +10,19 @@ import bootstrap from './core/Bootstrap';
 import { IEraContext as RawContextT } from './context';
 import { IEraState as RawStateT } from './state';
 import { IEraConfig as RawConfigT } from './config';
-import { BaseKV, AppOption, EraFilter, EraMiddleware } from './core/interfaces';
+import {
+    BaseKV,
+    AppOption,
+    EraFilter,
+    EraMiddleware,
+    EraInterceptor
+} from './core/interfaces';
 import { Logger } from './core';
-import { FilterRegistry, MiddlewareRegistry } from './core/registry';
+import {
+    FilterRegistry,
+    MiddlewareRegistry,
+    InterceptorRegistry
+} from './core/registry';
 
 const yellow = clc.xterm(3);
 
@@ -65,13 +75,17 @@ export class EraApplication<
 
     readonly projectRoot: string = path.resolve(process.cwd());
 
-    public useFilter(filter: EraFilter) {
+    public useGlobalFilter(filter: EraFilter) {
         FilterRegistry.registerForGlobal(filter);
     }
 
-    public useMiddleware(middleware: EraMiddleware) {
-        MiddlewareRegistry.registerForGlobal(middleware);
+    public useGlobalInterceptor(interceptor: EraInterceptor) {
+        InterceptorRegistry.registerForGlobal(interceptor);
     }
+
+    // public useGlobalMiddleware(middleware: EraMiddleware) {
+    //     MiddlewareRegistry.registerForGlobal(middleware);
+    // }
 
     public async run(options?: AppOption, beforeInit?: Function) {
         try {
@@ -105,7 +119,7 @@ export class EraApplication<
         // 加载配置
         this.loadConfig(options);
         // 加载路由/控制器/服务
-        bootstrap(this as any);
+        await bootstrap(this as any);
     }
 
     private loadEnv() {

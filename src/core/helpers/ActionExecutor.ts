@@ -24,6 +24,14 @@ export class ActionExecutor {
         return headers[expression];
     }
 
+    static getCookie(ctx: IEraContext, expression: string = '') {
+        const cookies = ctx.cookies;
+        if (!expression) {
+            return '';
+        }
+        return cookies.get(expression);
+    }
+
     static getQuery(ctx: IEraContext, expression: string = '') {
         const query = ctx.request.query;
         if (!expression) {
@@ -68,6 +76,9 @@ export class ActionExecutor {
                         break;
                     case ParamType.Header:
                         args.push(this.getHeader(ctx, param.expression));
+                        break;
+                    case ParamType.Cookie:
+                        args.push(this.getCookie(ctx, param.expression));
                         break;
                     case ParamType.Path:
                         args.push(this.getParam(ctx, param.expression));

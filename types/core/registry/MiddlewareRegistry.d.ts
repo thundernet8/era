@@ -1,4 +1,4 @@
-import { Constructor, MiddlewareDecoratorOptions, EraMiddleware, EraMiddlewareFunction } from '../interfaces';
+import { Constructor, MiddlewareDecoratorOptions, EraMiddleware, EraMiddlewareLambda } from '../interfaces';
 import { ActionMetadata } from './ActionRegistry';
 import { IEraConfig } from '../../config';
 export declare class MiddlewareMetadata {
@@ -16,9 +16,9 @@ export declare class MiddlewareRegistry {
     static register(type: EraMiddleware, options?: MiddlewareDecoratorOptions): void;
     private static resolveMiddlewareMetadata;
     static registerForGlobal(middleware: EraMiddleware): void;
-    static registerForController(controller: Constructor, middleware: EraMiddleware): void;
+    static registerForController(controller: Constructor, middlewares: EraMiddleware[]): void;
     static getGlobalMiddlewares(appConfig: IEraConfig): MiddlewareMetadata[];
     static getControllerMiddlewares(controller: Constructor): MiddlewareMetadata[];
     static getMiddleware(type: EraMiddleware): MiddlewareMetadata | undefined;
-    static resolveMiddlewareHandler(middleware: MiddlewareMetadata): EraMiddlewareFunction;
+    static resolveMiddlewareHandler(middleware: MiddlewareMetadata): EraMiddlewareLambda;
 }

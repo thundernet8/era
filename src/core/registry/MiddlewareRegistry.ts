@@ -4,12 +4,12 @@ import {
     MiddlewareDecoratorOptions,
     EraMiddleware,
     EraMiddlewareClass,
-    EraMiddlewareFunction
+    EraMiddlewareLambda
 } from '../interfaces';
 import { ActionMetadata, ActionRegistry } from './ActionRegistry';
 import { IEraConfig } from '../../config';
 import { isClass } from '../utils';
-import { ActionExecutor } from 'core/helpers';
+import { ActionExecutor } from '../helpers';
 
 export class MiddlewareMetadata {
     public readonly type: EraMiddleware;
@@ -82,7 +82,7 @@ export class MiddlewareRegistry {
                       type as Constructor<EraMiddlewareClass>,
                       'use'
                   )
-                : (type as EraMiddlewareFunction);
+                : (type as EraMiddlewareLambda);
             if (action instanceof ActionMetadata) {
                 action.isMiddlewareAction = true;
             }
@@ -113,19 +113,26 @@ export class MiddlewareRegistry {
 
     public static registerForController(
         controller: Constructor,
-        middleware: EraMiddleware
+        middlewares: EraMiddleware[]
     ) {
-        const middlewareMetadata = this.resolveMiddlewareMetadata(middleware);
-        if (middlewareMetadata) {
-            const controllerMiddlewareMetadatas =
-                this.controllerUsedMiddlewares.get(controller) || [];
-            if (controllerMiddlewareMetadatas.indexOf(middlewareMetadata) < 0) {
-                controllerMiddlewareMetadatas.push(middlewareMetadata);
-            }
-            this.controllerUsedMiddlewares.set(
-                controller,
-                controllerMiddlewareMetadatas
+        for (const middleware of middlewares) {
+            const middlewareMetadata = this.resolveMiddlewareMetadata(
+                middleware
             );
+            if (middlewareMetadata) {
+                const controllerMiddlewareMetadatas =
+                    this.controllerUsedMiddlewares.get(controller) || [];
+                if (
+                    controllerMiddlewareMetadatas.indexOf(middlewareMetadata) <
+                    0
+                ) {
+                    controllerMiddlewareMetadatas.push(middlewareMetadata);
+                }
+                this.controllerUsedMiddlewares.set(
+                    controller,
+                    controllerMiddlewareMetadatas
+                );
+            }
         }
     }
 
@@ -156,12 +163,16 @@ export class MiddlewareRegistry {
 
     public static resolveMiddlewareHandler(
         middleware: MiddlewareMetadata
-    ): EraMiddlewareFunction {
+    ): EraMiddlewareLambda {
         if (typeof middleware.action === 'function') {
-            return middleware.type as EraMiddlewareFunction;
+            return middleware.type as EraMiddlewareLambda;
         }
         return async (ctx, next) => {
-            ActionExecutor.exec(middleware.action as ActionMetadata, ctx, next);
+            return ActionExecutor.exec(
+                middleware.action as ActionMetadata,
+                ctx,
+                next
+            );
         };
     }
 }

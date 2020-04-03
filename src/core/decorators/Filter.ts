@@ -1,18 +1,19 @@
 import {
     FilterDecoratorOptions,
     EraFilter,
-    EraFilterClass,
+    EraExceptionFilterClass,
     Constructor
 } from '../interfaces';
 import { FilterRegistry } from '../registry';
 import { isClass, isObject } from '../utils';
 
 /**
- * 过滤器装饰器
+ * 异常过滤器装饰器
  */
-export function Filter(options: FilterDecoratorOptions = {}) {
-    return (target: Constructor<EraFilterClass>) => {
-        FilterRegistry.register(target, options);
+export function ExceptionFilter() {
+    // options: FilterDecoratorOptions = {}
+    return (target: EraFilter) => {
+        FilterRegistry.register(target, {} /* options */);
     };
 }
 
@@ -20,25 +21,25 @@ export function Filter(options: FilterDecoratorOptions = {}) {
  * 为控制器或控制器方法添加过滤器
  * @param filter
  */
-export function useFilter(filter: EraFilter) {
+export function UseFilters(...filters: EraFilter[]) {
     return (target: any, name?: string, ...rest) => {
         if (isClass(target)) {
-            FilterRegistry.registerForController(target, filter);
+            FilterRegistry.registerForController(target, filters);
         }
-        if (
-            isObject(target) &&
-            name &&
-            typeof target[name] === 'function' &&
-            rest.length === 0
-        ) {
-            FilterRegistry.registerForAction(
-                target.constructor as Constructor,
-                name,
-                filter
-            );
-        }
+        // if (
+        //     isObject(target) &&
+        //     name &&
+        //     typeof target[name] === 'function' &&
+        //     rest.length === 0
+        // ) {
+        //     FilterRegistry.registerForAction(
+        //         target.constructor as Constructor,
+        //         name,
+        //         filter
+        //     );
+        // }
         throw new Error(
-            `useFilter decorator can only be use for a class or a method of class`
+            `UseFilters decorator can only be use for a controller class`
         );
     };
 }

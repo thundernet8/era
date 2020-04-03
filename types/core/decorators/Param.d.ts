@@ -1,7 +1,8 @@
 import { ParamDecoratorOptions } from '../interfaces';
-export declare function ContextParam(): (target: any, action: string, index: number) => void;
-export declare function NextParam(): (target: any, action: string, index: number) => void;
-export declare function PathParam(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
-export declare function QueryParam(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
-export declare function BodyParam(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
-export declare function HeaderParam(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
+export declare function Context(): (target: any, action: string, index: number) => void;
+export declare function Next(): (target: any, action: string, index: number) => void;
+export declare function Path(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
+export declare function Query(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
+export declare function Body(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
+export declare function Header(expression?: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;
+export declare function Cookie(expression: string, options?: ParamDecoratorOptions): (target: any, action: string, index: number) => void;

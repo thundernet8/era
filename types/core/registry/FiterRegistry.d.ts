@@ -1,5 +1,5 @@
-import { Constructor, FilterDecoratorOptions, FilterPosition, EraFilter, EraFilterFunction } from '../interfaces';
-import { ActionMetadata } from '../../core/registry';
+import { Constructor, FilterDecoratorOptions, FilterPosition, EraFilter, EraExceptionFilterLambda } from '../interfaces';
+import { ActionMetadata } from '../registry';
 export declare class FilterMetadata {
     readonly type: EraFilter;
     readonly paths: string[];
@@ -16,10 +16,7 @@ export declare class FilterRegistry {
     static register(type: EraFilter, options?: FilterDecoratorOptions): void;
     private static resolveFilterMetadata;
     static registerForGlobal(filter: EraFilter): void;
-    static registerForController(controller: Constructor, filter: EraFilter): void;
-    static registerForAction(controller: Constructor, actionName: string, filter: EraFilter): void;
+    static registerForController(controller: Constructor, filters: EraFilter[]): void;
     static getFilters(controller: Constructor, actionName: string): FilterMetadata[];
-    static getBeforeFilters(controller: Constructor, actionName: string): FilterMetadata[];
-    static getAfterFilters(controller: Constructor, actionName: string): FilterMetadata[];
-    static resolveFilterHandler(filter: FilterMetadata): EraFilterFunction;
+    static resolveFilterHandler(filter: FilterMetadata): EraExceptionFilterLambda;
 }

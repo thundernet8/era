@@ -1,17 +1,6 @@
-import { Constructor, EraMiddleware, EraFilter } from '../interfaces';
-interface ControllerDecoratorOptions {
-    /**
-     * 控制器scoped的中间件
-     */
-    middlewares?: EraMiddleware[];
-    /**
-     * 控制器scoped的过滤器
-     */
-    filters?: EraFilter[];
-}
+import { Constructor } from '../interfaces';
 /**
  * 控制器装饰器
  * @param prefix 路由前缀
  */
-export declare function Controller(prefix?: string, options?: ControllerDecoratorOptions): (target: Constructor<any>) => void;
-export {};
+export declare function Controller(prefix?: string): (target: Constructor<any>) => void;
