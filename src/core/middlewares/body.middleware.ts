@@ -1,5 +1,5 @@
 import bodyParse from 'koa-bodyparser';
-import { EraMiddleware, EraMiddlewareClass } from '../interfaces';
+import { EraMiddlewareClass } from '../interfaces';
 import { Middleware } from '../decorators';
 import { IEraContext } from '../../context';
 
