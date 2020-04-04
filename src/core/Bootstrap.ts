@@ -20,6 +20,7 @@ import {
     FilterRegistry,
     InterceptorRegistry
 } from './registry';
+import { DBService } from './services/db.service';
 
 const yellow = clc.xterm(3);
 
@@ -79,21 +80,21 @@ function loadServices(app: EraApplication) {
     const serviceMetadatas = ServiceRegistry.getServices();
     for (const serviceMetadata of serviceMetadatas) {
         logger.log(`+ Load service ${yellow(serviceMetadata.type.name)}`);
-        try {
-            ServiceRegistry.resolve(serviceMetadata.type);
-        } catch (e) {
-            throw new DIException(
-                `The service class:[${serviceMetadata.type.name}] cannot be resolved`,
-                e
-            );
-        }
+        // try {
+        //     ServiceRegistry.resolve(serviceMetadata.type);
+        // } catch (e) {
+        //     throw new DIException(
+        //         `The service class:[${serviceMetadata.type.name}] cannot be resolved`,
+        //         e
+        //     );
+        // }
     }
     logger.log(`Load services done ${yellow(`+${Date.now() - start}ms`)}`);
 }
 
 function loadControllers(app: EraApplication) {
     const logger = new Logger('Bootstrap<Controller>');
-    logger.log('Load controllers');
+    logger.log('Load controllers', 'Bootstrap');
     const start = Date.now();
 
     const controllerDir = path.resolve(app.projectRoot, 'app/controller');
@@ -104,14 +105,14 @@ function loadControllers(app: EraApplication) {
     const controllerMetadatas = ControllerRegistry.getControllers();
     for (const controllerMetadata of controllerMetadatas) {
         logger.log(`+ Load controller ${controllerMetadata.type.name}`);
-        try {
-            ControllerRegistry.resolveController(controllerMetadata.type);
-        } catch (e) {
-            throw new DIException(
-                `The controller class:[${controllerMetadata.type.name}] cannot be resolved`,
-                e
-            );
-        }
+        // try {
+        //     ControllerRegistry.resolveController(controllerMetadata.type);
+        // } catch (e) {
+        //     throw new DIException(
+        //         `The controller class:[${controllerMetadata.type.name}] cannot be resolved`,
+        //         e
+        //     );
+        // }
         const routePrefix = controllerMetadata.routePrefix;
         const controllerMiddlewareMetadatas = MiddlewareRegistry.getControllerMiddlewares(
             controllerMetadata.type
@@ -125,7 +126,7 @@ function loadControllers(app: EraApplication) {
         const actions = Array.from(controllerMetadata.actions.values());
         for (const action of actions) {
             const { routes } = action;
-            const actionHandler = (ctx, next) => {
+            const actionHandler = async (ctx, next) => {
                 return ActionExecutor.exec(action, ctx, next);
             };
 
@@ -139,9 +140,19 @@ function loadControllers(app: EraApplication) {
                 action.actionName
             ).map(FilterRegistry.resolveFilterHandler);
 
+            const respSetMiddleware = async (ctx, next) => {
+                const result = await next();
+                if (typeof ctx.response._body === 'undefined') {
+                    // ctx.response.writable
+                    ctx.status = 200;
+                    ctx.body = result;
+                }
+                return result;
+            };
+
             const filtersApplyMiddleware = async (ctx, next) => {
                 try {
-                    await next();
+                    return next();
                 } catch (e) {
                     FilterExecutor.applyFilters(e, ctx, exceptionFilters);
                 }
@@ -156,6 +167,7 @@ function loadControllers(app: EraApplication) {
                 subRouter[route.method](
                     route.path,
                     ...(controllerMiddlewares as any),
+                    respSetMiddleware,
                     filtersApplyMiddleware,
                     ...(interceptors as any),
                     actionHandler
@@ -171,8 +183,31 @@ function loadControllers(app: EraApplication) {
     logger.log(`Load controllers done ${yellow(`+${Date.now() - start}ms`)}`);
 }
 
-export default function bootstrap(app: EraApplication) {
+function loadModels(app: EraApplication) {
+    const logger = new Logger('Bootstrap<Model>');
+    const start = Date.now();
+    logger.log('Load models');
+
+    const modelDir = path.resolve(app.projectRoot, 'app/model');
+    logger.log(`Scan models from directory: ${yellow(modelDir)}`);
+    scan(modelDir, '**/*.model.{js,ts}');
+    logger.log(`Load models done ${yellow(`+${Date.now() - start}ms`)}`);
+}
+
+async function connectDB(app: EraApplication) {
+    if (app.config.db) {
+        app.logger.log(`init db connection`, 'Database');
+        const db = new DBService(app);
+        container.registerInstance('DB', db);
+        await db.init();
+    }
+}
+
+export default async function bootstrap(app: EraApplication) {
+    container.registerInstance('App', app);
     loadMiddlewares(app);
     loadServices(app);
     loadControllers(app);
+    loadModels(app);
+    await connectDB(app);
 }

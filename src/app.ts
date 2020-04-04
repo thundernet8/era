@@ -24,9 +24,12 @@ import {
     InterceptorRegistry
 } from './core/registry';
 
-const yellow = clc.xterm(3);
-
 export * from './core';
+export { RawContextT as IEraContext };
+export { RawStateT as IEraState };
+export { RawConfigT as IEraConfig };
+
+const yellow = clc.xterm(3);
 
 export interface EraApplication<StateT = RawStateT, ContextT = RawContextT>
     extends Koa<StateT, ContextT> {

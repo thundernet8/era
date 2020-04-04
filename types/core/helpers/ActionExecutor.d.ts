@@ -1,6 +1,6 @@
 import { ActionMetadata } from '../registry';
 import { IEraContext } from '../../context';
-import { Logger } from '../services/Log.Service';
+import { Logger } from '../services/log.service';
 export declare class ActionExecutor {
     static logger: Logger;
     static getBody(ctx: IEraContext, expression?: string): any;

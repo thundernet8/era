@@ -1,5 +1,5 @@
 import { injectable, container } from 'tsyringe';
-import { Constructor, IService } from '../interfaces';
+import { Constructor, IService, ServiceDecoratorOptions } from '../interfaces';
 
 class ServiceMetadata {
     public readonly type: Constructor;
@@ -12,15 +12,22 @@ class ServiceMetadata {
 export class ServiceRegistry {
     private static services: Map<Constructor, ServiceMetadata> = new Map();
 
-    public static register(type: Constructor) {
+    public static register(
+        type: Constructor,
+        options: ServiceDecoratorOptions = {}
+    ) {
         injectable()(type);
-        container.register(type, type);
+        const singleton = !!options.singleton;
+        const injectToken = options.injectToken || type;
+        if (singleton) {
+            container.registerSingleton(injectToken, type);
+        } else {
+            container.register(injectToken, type);
+        }
         if (!this.services.get(type)) {
             const metadata = new ServiceMetadata(type);
             this.services.set(type, metadata);
         }
-
-        return type;
     }
 
     public static resolve(type: Constructor) {

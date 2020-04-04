@@ -1,5 +1,6 @@
 import bodyParser from 'koa-bodyparser';
 import { IEraConfig } from '../../config';
+import { Constructor } from './Constructor';
 export interface AppOption {
     name?: string;
     env?: string;
@@ -55,4 +56,8 @@ export interface FilterDecoratorOptions {
     position?: FilterPosition;
 }
 export declare type FilterPosition = 'before' | 'after';
+export interface ServiceDecoratorOptions {
+    singleton?: boolean;
+    injectToken?: string | Constructor;
+}
 export {};

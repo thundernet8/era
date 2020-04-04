@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 import { ActionMetadata } from '../registry';
 import { IEraContext } from '../../context';
 import { ParamType } from '../interfaces';
-import { Logger } from '../services/Log.Service';
+import { Logger } from '../services/log.service';
 import { EraController, EraService } from '../baseclass';
 
 export class ActionExecutor {

@@ -21,7 +21,7 @@ export class FilterExecutor {
         ctx: IEraContext,
         filters: EraExceptionFilterLambda[]
     ) {
-        if (ctx.res.writableEnded) {
+        if (typeof ctx.response['_body'] !== 'undefined') {
             return;
         }
         let result;

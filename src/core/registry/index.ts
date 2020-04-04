@@ -4,3 +4,4 @@ export * from './ServiceRegistry';
 export * from './MiddlewareRegistry';
 export * from './FiterRegistry';
 export * from './InterceptorRegistry';
+export * from './ModelRegistry';

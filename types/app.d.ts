@@ -6,6 +6,9 @@ import { IEraConfig as RawConfigT } from './config';
 import { AppOption, EraFilter, EraInterceptor } from './core/interfaces';
 import { Logger } from './core';
 export * from './core';
+export { RawContextT as IEraContext };
+export { RawStateT as IEraState };
+export { RawConfigT as IEraConfig };
 export interface EraApplication<StateT = RawStateT, ContextT = RawContextT> extends Koa<StateT, ContextT> {
     test: number;
 }
