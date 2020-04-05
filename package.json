@@ -1,6 +1,6 @@
 {
     "name": "era",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "基于koa的node server，使用typescript开发",
     "main": "index.js",
     "types": "types/index.d.ts",
