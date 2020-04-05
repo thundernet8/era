@@ -2,7 +2,6 @@ export * from './baseclass';
 export * from './decorators';
 export * from './exceptions';
 export * from './services';
-export * from './middlewares';
 export {
     inject as Inject,
     injectAll as InjectAll,
@@ -19,5 +18,5 @@ export {
     isTokenProvider,
     ValueProvider,
     isValueProvider,
-    singleton as Singleton
+    singleton as Singleton,
 } from 'tsyringe';

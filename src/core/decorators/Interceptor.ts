@@ -1,8 +1,4 @@
-import {
-    EraInterceptor,
-    EraInterceptorClass,
-    Constructor
-} from '../interfaces';
+import { EraInterceptor, Constructor } from '../interfaces';
 import { InterceptorRegistry } from '../registry';
 import { isClass, isObject } from '../utils';
 

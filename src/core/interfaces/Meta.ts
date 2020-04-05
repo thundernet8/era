@@ -1,5 +1,3 @@
-import { IEraContext } from '../../context';
-
 export enum ParamType {
     Path,
     Query,
@@ -9,7 +7,7 @@ export enum ParamType {
     Cookie,
     Session,
     Context,
-    Next
+    Next,
 }
 
 export enum HttpMethod {
@@ -20,7 +18,7 @@ export enum HttpMethod {
     Put = 'put',
     Patch = 'patch',
     Options = 'options',
-    Head = 'head'
+    Head = 'head',
 }
 
 export enum HttpStatus {
@@ -67,7 +65,7 @@ export enum HttpStatus {
     BAD_GATEWAY = 502,
     SERVICE_UNAVAILABLE = 503,
     GATEWAY_TIMEOUT = 504,
-    HTTP_VERSION_NOT_SUPPORTED = 505
+    HTTP_VERSION_NOT_SUPPORTED = 505,
 }
 
 export interface ActionRoute {

@@ -5,7 +5,6 @@ import {
     EraInterceptorClass,
     EraInterceptorLambda,
 } from '../interfaces';
-import { IEraConfig } from '../../config';
 import { isClass } from '../utils';
 import { ActionMetadata, ActionRegistry } from '../registry';
 import { ActionExecutor } from '../helpers';

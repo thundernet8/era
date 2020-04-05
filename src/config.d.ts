@@ -23,5 +23,4 @@ export interface IEraConfig {
      * 启用的内置中间件
      */
     coreMiddlewares?: InnerMiddleware[];
-    _customizeConfigProp?: string;
 }

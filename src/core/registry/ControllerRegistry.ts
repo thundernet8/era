@@ -1,26 +1,23 @@
-import { autoInjectable, injectable, container } from 'tsyringe';
+import { injectable, container } from 'tsyringe';
 import {
     Constructor,
     EraMiddleware,
     HttpMethod,
-    IController
+    IController,
 } from '../interfaces';
 import { ActionRegistry, ActionMetadata } from './ActionRegistry';
-import { MiddlewareMetadata, MiddlewareRegistry } from './MiddlewareRegistry';
+import { MiddlewareRegistry } from './MiddlewareRegistry';
 
 class ControllerMetadata {
     public readonly type: Constructor;
 
     public routePrefix: string;
 
-    // public middlewares: MiddlewareMetadata[];
-
     public readonly actions: Map<string, ActionMetadata>;
 
     constructor(type: Constructor) {
         this.type = type;
         this.routePrefix = '';
-        // this.middlewares = [];
         this.actions = new Map();
     }
 }
@@ -66,7 +63,7 @@ export class ControllerRegistry {
         for (const path of paths) {
             actionMetadata.routes.push({
                 method: httpMethod,
-                path
+                path,
             });
         }
 

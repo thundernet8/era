@@ -1,11 +1,6 @@
-import {
-    FilterDecoratorOptions,
-    EraFilter,
-    EraExceptionFilterClass,
-    Constructor
-} from '../interfaces';
+import { EraFilter } from '../interfaces';
 import { FilterRegistry } from '../registry';
-import { isClass, isObject } from '../utils';
+import { isClass } from '../utils';
 
 /**
  * 异常过滤器装饰器
@@ -13,7 +8,7 @@ import { isClass, isObject } from '../utils';
 export function ExceptionFilter() {
     // options: FilterDecoratorOptions = {}
     return (target: EraFilter) => {
-        FilterRegistry.register(target, {} /* options */);
+        FilterRegistry.register(target);
     };
 }
 
@@ -26,18 +21,6 @@ export function UseFilters(...filters: EraFilter[]) {
         if (isClass(target)) {
             FilterRegistry.registerForController(target, filters);
         }
-        // if (
-        //     isObject(target) &&
-        //     name &&
-        //     typeof target[name] === 'function' &&
-        //     rest.length === 0
-        // ) {
-        //     FilterRegistry.registerForAction(
-        //         target.constructor as Constructor,
-        //         name,
-        //         filter
-        //     );
-        // }
         throw new Error(
             `UseFilters decorator can only be use for a controller class`
         );

@@ -1,11 +1,4 @@
-import {
-    ConnectionOptions,
-    createConnection,
-    Connection,
-    Repository,
-    ConnectionManager
-} from 'typeorm';
-import { inject, container } from 'tsyringe';
+import { ConnectionOptions, createConnection, Connection } from 'typeorm';
 import { Service } from '../decorators';
 import { EraApplication } from '../../app';
 import { Constructor } from '../interfaces';
@@ -13,7 +6,7 @@ import { ModelRegistry } from '../registry/ModelRegistry';
 
 @Service({
     singleton: true,
-    injectToken: 'DB'
+    injectToken: 'DB',
 })
 export class DBService {
     public connection: Connection = null as any;
@@ -29,7 +22,7 @@ export class DBService {
         const entities = ModelRegistry.getModels();
         this.connection = await createConnection({
             ...this.config,
-            entities
+            entities,
         });
     }
 

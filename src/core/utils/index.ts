@@ -1,5 +1,3 @@
-import { type } from 'os';
-
 export const isUndefined = (obj: any): obj is undefined =>
     typeof obj === 'undefined';
 

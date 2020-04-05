@@ -1,5 +1,4 @@
 import clc from 'cli-color';
-import { inject } from 'tsyringe';
 import { isObject } from '../utils';
 import { Service } from '../decorators';
 

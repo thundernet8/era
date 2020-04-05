@@ -1,1 +1,0 @@
-export { EraMiddleware } from '../interfaces';

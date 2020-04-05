@@ -6,10 +6,8 @@ import {
     ParameterizedContext,
     Request as KoaRequest,
     Response as KoaResponse,
-    Next as KoaNext
+    Next as KoaNext,
 } from 'koa';
-
-type Application = EraApplication;
 
 type EraContext = ParameterizedContext<IEraState, IEraContext>;
 

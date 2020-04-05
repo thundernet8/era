@@ -14,22 +14,15 @@ import {
     BaseKV,
     AppOption,
     EraFilter,
-    EraMiddleware,
-    EraInterceptor
+    EraInterceptor,
 } from './core/interfaces';
 import { Logger } from './core';
-import {
-    FilterRegistry,
-    MiddlewareRegistry,
-    InterceptorRegistry
-} from './core/registry';
+import { FilterRegistry, InterceptorRegistry } from './core/registry';
 
 export * from './core';
 export { RawContextT as IEraContext };
 export { RawStateT as IEraState };
 export { RawConfigT as IEraConfig };
-
-const yellow = clc.xterm(3);
 
 export interface EraApplication<StateT = RawStateT, ContextT = RawContextT>
     extends Koa<StateT, ContextT> {
@@ -98,7 +91,7 @@ export class EraApplication<
             }
             const port = this.config.port;
             if (!this.config.notListen) {
-                await new Promise(resolve => {
+                await new Promise((resolve) => {
                     this.listen(port, () => {
                         resolve();
                         this.logger.log(
@@ -147,7 +140,7 @@ export class EraApplication<
             stag: 'stag',
             staging: 'stag',
             prod: 'prod',
-            production: 'prod'
+            production: 'prod',
         };
         if (!Object.keys(envMap).includes(rawEnv || '')) {
             rawEnv = process.env.NODE_ENV === 'production' ? 'dev' : 'local';

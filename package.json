@@ -1,5 +1,5 @@
 {
-    "name": "era",
+    "name": "era2",
     "version": "0.0.1",
     "description": "基于koa的node server，使用typescript开发",
     "main": "index.js",
@@ -19,6 +19,13 @@
         "email": "chinash2010@gmail.com",
         "url": "https://github.com/thundernet8"
     },
+    "keywords": [
+        "typescript",
+        "koa",
+        "framework",
+        "ioc",
+        "dependency-injection"
+    ],
     "scripts": {
         "build": "rimraf dist && tsc -p tsconfig.build.json && cp -R src/*.d.ts types",
         "prepublishOnly": "npm run build",

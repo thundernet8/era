@@ -1,52 +1,21 @@
 import { container, injectable } from 'tsyringe';
 import {
     Constructor,
-    FilterDecoratorOptions,
-    FilterPosition,
     EraFilter,
     EraExceptionFilterClass,
-    EraExceptionFilterLambda
+    EraExceptionFilterLambda,
 } from '../interfaces';
-import { IEraConfig } from '../../config';
 import { isClass } from '../utils';
 import { ActionMetadata, ActionRegistry } from '../registry';
-import { ActionExecutor } from '../helpers';
 
 export class FilterMetadata {
     public readonly type: EraFilter;
 
-    public readonly paths: string[];
-
-    public readonly priority: number;
-
-    public readonly position: FilterPosition;
-
     public readonly action: ActionMetadata | Function;
 
-    constructor(
-        type: EraFilter,
-        action: ActionMetadata | Function,
-        options: FilterDecoratorOptions = {}
-    ) {
+    constructor(type: EraFilter, action: ActionMetadata | Function) {
         this.type = type;
         this.action = action;
-        if (typeof options.priority !== 'undefined') {
-            this.priority = options.priority;
-        } else {
-            this.priority = 10;
-        }
-
-        if (Array.isArray(options.match)) {
-            this.paths = options.match;
-        } else {
-            this.paths = ['(.*)'];
-        }
-
-        if (options.position === 'after') {
-            this.position = 'after';
-        } else {
-            this.position = 'before';
-        }
     }
 }
 
@@ -65,10 +34,7 @@ export class FilterRegistry {
         Map<string, FilterMetadata>
     > = new Map();
 
-    public static register(
-        type: EraFilter,
-        options: FilterDecoratorOptions = {}
-    ) {
+    public static register(type: EraFilter) {
         let filterMetadata = this.filters.get(type);
         if (!filterMetadata) {
             if (isClass(type)) {
@@ -84,7 +50,7 @@ export class FilterRegistry {
                       'catch'
                   )
                 : (type as EraExceptionFilterLambda);
-            filterMetadata = new FilterMetadata(type, action, options);
+            filterMetadata = new FilterMetadata(type, action);
             this.filters.set(type, filterMetadata);
         }
     }
@@ -129,24 +95,6 @@ export class FilterRegistry {
         }
     }
 
-    // public static registerForAction(
-    //     controller: Constructor,
-    //     actionName: string,
-    //     filter: EraFilter
-    // ) {
-    //     const filterMetadata = this.resolveFilterMetadata(filter);
-    //     if (filterMetadata) {
-    //         const filterMetadataMap =
-    //             this.actionUsedFilters.get(controller) || new Map();
-    //         const filterMetadatas = filterMetadataMap.get(actionName) || [];
-    //         if (filterMetadatas.indexOf(filterMetadata) < 0) {
-    //             filterMetadatas.push(filterMetadata);
-    //         }
-    //         filterMetadataMap.set(actionName, filterMetadatas);
-    //         this.actionUsedFilters.set(controller, filterMetadataMap);
-    //     }
-    // }
-
     public static getFilters(controller: Constructor, actionName: string) {
         const controllerFilters: FilterMetadata[] =
             this.controllerUsedFilters.get(controller) || [];
@@ -161,7 +109,7 @@ export class FilterRegistry {
             .concat(this.globalUsedFilters)
             .concat(controllerFilters)
             .concat(actionFilters);
-        return filters.sort((a, b) => a.priority - b.priority);
+        return filters;
     }
 
     public static resolveFilterHandler(
