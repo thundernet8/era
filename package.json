@@ -1,5 +1,5 @@
 {
-    "name": "node-server",
+    "name": "era",
     "version": "0.0.0",
     "description": "基于koa的node server，使用typescript开发",
     "main": "index.js",
@@ -12,7 +12,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/thundernet8/node-server.git"
+        "url": "https://github.com/thundernet8/era.git"
     },
     "author": {
         "name": "Touchumind",
@@ -32,7 +32,8 @@
         "test": "NODE_ENV=test ts-node ./test/index.ts",
         "coverage": "npm test -- --coverage",
         "lint": "tslint --format stylish -p tsconfig.json",
-        "lint:fix": "tslint --format stylish -p tsconfig.json --fix"
+        "lint:fix": "tslint --format stylish -p tsconfig.json --fix",
+        "bench:routing": "make -C ./benchmarks/routing"
     },
     "dependencies": {
         "deepmerge": "^4.2.2",

@@ -3,7 +3,7 @@ import {
     Constructor,
     EraInterceptor,
     EraInterceptorClass,
-    EraInterceptorLambda
+    EraInterceptorLambda,
 } from '../interfaces';
 import { IEraConfig } from '../../config';
 import { isClass } from '../utils';
@@ -156,11 +156,17 @@ export class InterceptorRegistry {
             return interceptor.type as EraInterceptorLambda;
         }
         return async (ctx, next) => {
-            return ActionExecutor.exec(
+            const result = await ActionExecutor.exec(
                 interceptor.action as ActionMetadata,
                 ctx,
                 next
             );
+            if (ctx.exception) {
+                const exception = ctx.exception;
+                ctx.exception = null;
+                throw exception;
+            }
+            return result;
         };
     }
 }

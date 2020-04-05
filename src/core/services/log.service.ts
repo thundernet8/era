@@ -22,7 +22,7 @@ export class Logger implements LoggerService {
         'error',
         'warn',
         'debug',
-        'verbose'
+        'verbose',
     ];
     private static lastTimestamp?: number;
     private static instance?: typeof Logger | LoggerService = Logger;
@@ -132,6 +132,9 @@ export class Logger implements LoggerService {
     }
 
     private isLogLevelEnabled(level: LogLevel): boolean {
+        if (process.env.DISABLE_LOG) {
+            return false;
+        }
         return Logger.logLevels.includes(level);
     }
 
@@ -151,7 +154,7 @@ export class Logger implements LoggerService {
             minute: 'numeric',
             second: 'numeric',
             day: '2-digit',
-            month: '2-digit'
+            month: '2-digit',
         };
         const timestamp = new Date(Date.now()).toLocaleString(
             undefined,

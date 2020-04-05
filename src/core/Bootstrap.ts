@@ -1,9 +1,9 @@
 import { container } from 'tsyringe';
 container.register(String, {
-    useValue: ''
+    useValue: '',
 });
 container.register(Boolean, {
-    useValue: false
+    useValue: false,
 });
 
 import * as path from 'path';
@@ -18,7 +18,7 @@ import {
     ServiceRegistry,
     ControllerRegistry,
     FilterRegistry,
-    InterceptorRegistry
+    InterceptorRegistry,
 } from './registry';
 import { DBService } from './services/db.service';
 
@@ -121,13 +121,17 @@ function loadControllers(app: EraApplication) {
             MiddlewareRegistry.resolveMiddlewareHandler
         );
         const subRouter = new Router({
-            prefix: routePrefix
+            prefix: routePrefix,
         });
         const actions = Array.from(controllerMetadata.actions.values());
         for (const action of actions) {
             const { routes } = action;
             const actionHandler = async (ctx, next) => {
-                return ActionExecutor.exec(action, ctx, next);
+                try {
+                    return ActionExecutor.exec(action, ctx, next);
+                } catch (e) {
+                    ctx.exception = e;
+                }
             };
 
             const interceptors = InterceptorRegistry.getInterceptors(
@@ -152,7 +156,13 @@ function loadControllers(app: EraApplication) {
 
             const filtersApplyMiddleware = async (ctx, next) => {
                 try {
-                    return next();
+                    const result = await next();
+                    if (ctx.exception) {
+                        const exception = ctx.exception;
+                        ctx.exception = null;
+                        throw exception;
+                    }
+                    return result;
                 } catch (e) {
                     FilterExecutor.applyFilters(e, ctx, exceptionFilters);
                 }

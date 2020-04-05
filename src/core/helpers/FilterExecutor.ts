@@ -10,6 +10,7 @@ const globalExceptionFilter: EraExceptionFilterLambda = (
         ctx.status = exception.status;
         ctx.body = exception.message;
     } else {
+        console.error(exception);
         ctx.status = 500;
         ctx.body = 'Internal Server Error';
     }

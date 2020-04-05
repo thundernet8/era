@@ -1,5 +1,7 @@
 import { ConnectionOptions } from 'typeorm';
 
+type InnerMiddleware = 'requestId' | 'responseTime' | 'bodyParser';
+
 export interface IEraConfig {
     /**
      * 应用环境
@@ -17,5 +19,9 @@ export interface IEraConfig {
      * typeorm 连接数据库信息
      */
     db?: ConnectionOptions;
+    /**
+     * 启用的内置中间件
+     */
+    coreMiddlewares?: InnerMiddleware[];
     _customizeConfigProp?: string;
 }
