@@ -1,4 +1,4 @@
-import { Connection, Repository } from 'typeorm';
+import { Connection } from 'typeorm';
 import { EraApplication } from '../../app';
 import { Constructor } from '../interfaces';
 export declare class DBService {
@@ -7,5 +7,5 @@ export declare class DBService {
     private config;
     constructor(app: EraApplication);
     init(): Promise<void>;
-    getRepository<T>(model: Constructor<T>): Repository<T>;
+    getRepository<T>(model: Constructor<T>): import("typeorm").Repository<T>;
 }

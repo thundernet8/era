@@ -1,4 +1,5 @@
 import { IEraContext } from '../../context';
+import { IEraConfig } from '../../config';
 import EraApplication from '../../app';
 import { HttpException } from '../exceptions';
 
@@ -23,12 +24,17 @@ export interface EraMiddlewareClass {
 
 export type EraMiddlewareLambda = (
     ctx: IEraContext,
-    next: Function
+    next: () => Promise<any>
 ) => Promise<any>;
+
+export type EraMiddlewareLambdaFactory = (
+    appConfig: IEraConfig,
+    app: EraApplication
+) => EraMiddlewareLambda;
 
 export type EraMiddleware =
     | Constructor<EraMiddlewareClass>
-    | EraMiddlewareLambda;
+    | EraMiddlewareLambdaFactory;
 
 export interface EraExceptionFilterClass {
     name?: string;
@@ -51,7 +57,7 @@ export interface EraInterceptorClass {
 
 export type EraInterceptorLambda = (
     ctx: IEraContext,
-    next: Function
+    next: () => Promise<any>
 ) => Promise<any>;
 
 export type EraInterceptor =

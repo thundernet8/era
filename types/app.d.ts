@@ -37,7 +37,7 @@ export declare class EraApplication<StateT = RawStateT, ContextT = RawContextT> 
      * Middleware logger
      */
     middlewareLogger: Logger;
-    config: RawConfigT & AppOption;
+    config: RawConfigT;
     readonly projectRoot: string;
     useGlobalFilter(filter: EraFilter): void;
     useGlobalInterceptor(interceptor: EraInterceptor): void;

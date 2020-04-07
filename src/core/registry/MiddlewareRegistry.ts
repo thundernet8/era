@@ -4,10 +4,11 @@ import {
     MiddlewareDecoratorOptions,
     EraMiddleware,
     EraMiddlewareClass,
-    EraMiddlewareLambda
+    EraMiddlewareLambda,
+    EraMiddlewareLambdaFactory,
 } from '../interfaces';
 import { ActionMetadata, ActionRegistry } from './ActionRegistry';
-import { IEraConfig } from '../../config';
+import EraApplication from '../../app';
 import { isClass } from '../utils';
 import { ActionExecutor } from '../helpers';
 
@@ -82,7 +83,7 @@ export class MiddlewareRegistry {
                       type as Constructor<EraMiddlewareClass>,
                       'use'
                   )
-                : (type as EraMiddlewareLambda);
+                : (type as EraMiddlewareLambdaFactory);
             if (action instanceof ActionMetadata) {
                 action.isMiddlewareAction = true;
             }
@@ -136,16 +137,16 @@ export class MiddlewareRegistry {
         }
     }
 
-    public static getGlobalMiddlewares(appConfig: IEraConfig) {
+    public static getGlobalMiddlewares(app: EraApplication) {
         const middlewares: MiddlewareMetadata[] = [];
         // 默认启用的中间件作为全局中间件
-        this.middlewares.forEach(middleware => {
-            if (middleware.checkEnable(appConfig)) {
+        this.middlewares.forEach((middleware) => {
+            if (middleware.checkEnable(app.config, app)) {
                 middlewares.push(middleware);
             }
         });
         // app.useMiddleware注册的中间件强制启用并作为全局中间件
-        this.globalUsedMiddlewares.forEach(middleware => {
+        this.globalUsedMiddlewares.forEach((middleware) => {
             if (middlewares.indexOf(middleware) < 0) {
                 middlewares.push(middleware);
             }
@@ -162,10 +163,14 @@ export class MiddlewareRegistry {
     }
 
     public static resolveMiddlewareHandler(
-        middleware: MiddlewareMetadata
+        middleware: MiddlewareMetadata,
+        app: EraApplication
     ): EraMiddlewareLambda {
         if (typeof middleware.action === 'function') {
-            return middleware.type as EraMiddlewareLambda;
+            return (middleware.type as EraMiddlewareLambdaFactory)(
+                app.config,
+                app
+            );
         }
         return async (ctx, next) => {
             return ActionExecutor.exec(

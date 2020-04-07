@@ -67,7 +67,7 @@ export class EraApplication<
      */
     middlewareLogger!: Logger;
 
-    config!: RawConfigT & AppOption;
+    config!: RawConfigT;
 
     readonly projectRoot: string = path.resolve(process.cwd());
 
@@ -177,7 +177,7 @@ export class EraApplication<
         const config = merge(merge(defaultConfig, envBasedConfig), options);
         config.env = this.env;
         config.port = config.port || process.env.PORT || 8080;
-        this.config = config as RawConfigT & AppOption;
+        this.config = config as RawConfigT;
         if (options.name) {
             this.name = options.name;
         }

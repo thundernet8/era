@@ -1,6 +1,24 @@
 import bodyParser from 'koa-bodyparser';
+import EraApplication from '../../app';
 import { IEraConfig } from '../../config';
 import { Constructor } from './Constructor';
+
+/**
+ * koa-static中间件的选项
+ */
+interface StaticOption {
+    /**
+     * 静态资源文件夹相对于app文件夹的路径，默认public
+     */
+    root?: string;
+    maxage?: number;
+    hidden?: boolean;
+    index?: string;
+    defer?: boolean;
+    gzip?: boolean;
+    setHeaders?: (...args) => any;
+    extensions?: string[] | false;
+}
 
 export interface AppOption {
     name?: string;
@@ -15,9 +33,9 @@ export interface AppOption {
      */
     viewDir?: string;
     /**
-     * 静态资源文件夹相对于app文件夹的路径，默认public
+     * 静态资源中间件选项
      */
-    staticDir?: string;
+    static?: StaticOption;
     /**
      * koa-bodyparser的选项
      */
@@ -46,7 +64,10 @@ export interface MiddlewareDecoratorOptions {
     enable?: boolean | MiddlewareEnableFunction;
 }
 
-type MiddlewareEnableFunction = (config: IEraConfig) => boolean;
+type MiddlewareEnableFunction = (
+    config: IEraConfig,
+    app: EraApplication
+) => boolean;
 
 export interface ServiceDecoratorOptions {
     singleton?: boolean;

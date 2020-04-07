@@ -6,6 +6,5 @@ export interface IEraContext extends IRouterParamContext<IEraState> {}
 
 export interface IEraContext extends Koa.Context {
     requestId: string;
-    _customizeContextProp: string;
     [key: string]: any;
 }

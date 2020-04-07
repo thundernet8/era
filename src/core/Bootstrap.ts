@@ -40,15 +40,14 @@ function loadMiddlewares(app: EraApplication) {
     logger.log(`Scan middlewares from directory: ${yellow(middlewareDir)}`);
     scan(middlewareDir, '**/*.middleware.{js,ts}');
 
-    const middlewareMetadatas = MiddlewareRegistry.getGlobalMiddlewares(
-        app.config
-    );
+    const middlewareMetadatas = MiddlewareRegistry.getGlobalMiddlewares(app);
     const router = new Router();
     for (const middlewareMetadata of middlewareMetadatas) {
         logger.log(`+ Load middleware ${yellow(middlewareMetadata.type.name)}`);
         try {
             const middleware = MiddlewareRegistry.resolveMiddlewareHandler(
-                middlewareMetadata
+                middlewareMetadata,
+                app
             );
             router.all(middlewareMetadata.paths, middleware as any);
         } catch (e) {
@@ -118,7 +117,8 @@ function loadControllers(app: EraApplication) {
             controllerMetadata.type
         );
         const controllerMiddlewares = controllerMiddlewareMetadatas.map(
-            MiddlewareRegistry.resolveMiddlewareHandler
+            (metadata) =>
+                MiddlewareRegistry.resolveMiddlewareHandler(metadata, app)
         );
         const subRouter = new Router({
             prefix: routePrefix,

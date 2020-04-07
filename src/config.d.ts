@@ -1,8 +1,9 @@
 import { ConnectionOptions } from 'typeorm';
+import { AppOption } from './core/interfaces';
 
-type InnerMiddleware = 'requestId' | 'responseTime' | 'bodyParser';
+type InnerMiddleware = 'requestId' | 'responseTime' | 'bodyParser' | 'static';
 
-export interface IEraConfig {
+export interface IEraConfig extends AppOption {
     /**
      * 应用环境
      */

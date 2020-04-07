@@ -1,6 +1,23 @@
 import bodyParser from 'koa-bodyparser';
+import EraApplication from '../../app';
 import { IEraConfig } from '../../config';
 import { Constructor } from './Constructor';
+/**
+ * koa-static中间件的选项
+ */
+interface StaticOption {
+    /**
+     * 静态资源文件夹相对于app文件夹的路径，默认public
+     */
+    root?: string;
+    maxage?: number;
+    hidden?: boolean;
+    index?: string;
+    defer?: boolean;
+    gzip?: boolean;
+    setHeaders?: (...args: any[]) => any;
+    extensions?: string[] | false;
+}
 export interface AppOption {
     name?: string;
     env?: string;
@@ -10,13 +27,13 @@ export interface AppOption {
      */
     port?: number;
     /**
-     * 视图模板文件夹相对于app文件夹的路径，默认views
+     * 视图模板文件夹相对于app文件夹的路径，默认view
      */
     viewDir?: string;
     /**
-     * 静态资源文件夹相对于app文件夹的路径，默认public
+     * 静态资源中间件选项
      */
-    staticDir?: string;
+    static?: StaticOption;
     /**
      * koa-bodyparser的选项
      */
@@ -40,22 +57,7 @@ export interface MiddlewareDecoratorOptions {
      */
     enable?: boolean | MiddlewareEnableFunction;
 }
-declare type MiddlewareEnableFunction = (config: IEraConfig) => boolean;
-export interface FilterDecoratorOptions {
-    /**
-     * 过滤器优先级，数值越低优先被执行，默认10
-     */
-    priority?: number;
-    /**
-     * 路由匹配，使用koa路由格式
-     */
-    match?: string[];
-    /**
-     * 过滤器作用于请求上下文位置，默认before，即在请求处理前
-     */
-    position?: FilterPosition;
-}
-export declare type FilterPosition = 'before' | 'after';
+declare type MiddlewareEnableFunction = (config: IEraConfig, app: EraApplication) => boolean;
 export interface ServiceDecoratorOptions {
     singleton?: boolean;
     injectToken?: string | Constructor;

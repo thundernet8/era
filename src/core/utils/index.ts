@@ -10,6 +10,7 @@ export const isObject = (fn: any): fn is object =>
 export const isClass = (klass: any) => {
     return (
         typeof klass === 'function' &&
+        klass.prototype &&
         klass.prototype.constructor.name !== 'Function' &&
         klass.prototype.constructor.name !== 'Object'
     );
